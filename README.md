@@ -1,40 +1,40 @@
-# Сайт студии дизайна интерьера «PARD Studio»
+# PARD Studio — Interior Design Portfolio Website
 
-Мой первый учебный проект — сайт-портфолио для вымышленной студии дизайна интерьера.
+My first learning project — a portfolio website for a fictional interior design studio.
 
-**Живой сайт:** [посмотреть на Netlify](https://chic-valkyrie-e5fe5a.netlify.app/)
-
----
-
-## Что сделано
-
-Статический сайт на чистом HTML, CSS и JavaScript — без фреймворков и сборщиков.
-
-5 страниц с fullpage-навигацией:
-- Главная (hero-блок)
-- О студии (двухколоночный layout, статистика, услуги)
-- Портфолио (сетка проектов с лайтбоксом)
-- Команда (карточки сотрудников)
-- Форма заявки
+**Live site:** [view on Netlify](https://chic-valkyrie-e5fe5a.netlify.app/)
 
 ---
 
-## Технологии
+## What Was Built
 
-- **HTML5, CSS3, Vanilla JS** — вёрстка и логика
-- **Playwright** — автоматизированное тестирование
-- **Docker + nginx** — контейнеризация
-- **GitHub + Netlify** — хранение кода и деплой
+A static website in pure HTML, CSS, and JavaScript — no frameworks, no build tools.
+
+5 pages with fullpage navigation:
+- Home (hero section)
+- About (two-column layout, stats, services)
+- Portfolio (project grid with lightbox)
+- Team (staff cards)
+- Request form
 
 ---
 
-## Тестирование
+## Tech Stack
 
-Написал 72 теста, которые проверяют навигацию, лайтбокс, форму, мобильное меню и адаптивность.
-Тесты запускаются на 8 конфигурациях: Chrome, Firefox, Safari, iPad, iPhone и другие.
+- **HTML5, CSS3, Vanilla JS** — markup and logic
+- **Playwright** — automated testing
+- **Docker + nginx** — containerization
+- **GitHub + Netlify** — code storage and deployment
+
+---
+
+## Testing
+
+72 tests covering navigation, lightbox, form, mobile menu, and responsiveness.
+Tests run across 8 configurations: Chrome, Firefox, Safari, iPad, iPhone, and more.
 
 ```
-576 тестов — все проходят
+576 tests — all passing
 ```
 
 ```bash
@@ -45,22 +45,22 @@ npm test
 
 ---
 
-## Запуск через Docker
+## Run with Docker
 
 ```bash
 docker compose up -d --build
-# Сайт: http://localhost:8080
+# Site: http://localhost:8080
 ```
 
 ---
 
-## Чему научился
+## What I Learned
 
-- Вёрстка адаптивного сайта с нуля (5 брейкпоинтов — от 360px до 1440px)
-- Работа с CSS-переменными, grid, flexbox, transform, transition
-- JavaScript без библиотек — навигация, анимации, обработка событий, touch
-- Поиск и исправление багов (нашёл и исправил 27 штук)
-- Написание автотестов на Playwright
+- Building a responsive website from scratch (5 breakpoints — 360px to 1440px)
+- CSS variables, grid, flexbox, transform, transition
+- Vanilla JavaScript — navigation, animations, event handling, touch support
+- Finding and fixing bugs (found and fixed 27 of them)
+- Writing automated tests with Playwright
 - Docker: Dockerfile, nginx, docker-compose
-- Git и GitHub: коммиты, push, работа с репозиторием
-- Деплой на Netlify
+- Git and GitHub: commits, push, repository workflow
+- Deploying to Netlify
