@@ -701,7 +701,7 @@ test.describe('Responsive: Footer', () => {
     await openSite(page);
     await goToPage(page, 4);
     const text = await page.locator('.footer-copy').textContent();
-    expect(text).toContain('Серёга');
+    expect(text).toContain('PARD Studio');
   });
 });
 
