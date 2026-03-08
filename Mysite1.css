@@ -1,0 +1,1811 @@
+/* ===================== RESET & BASE =====================
+   Сброс стилей — убираем браузерные отступы и задаём базовые правила.
+   Применяется ко ВСЕМ элементам, включая псевдоэлементы ::before и ::after
+*/
+*,
+*::before,
+*::after {
+  margin: 0;
+  /* Убираем стандартные внешние отступы браузера (например, у <p>, <h1> есть margin по умолчанию) */
+  padding: 0;
+  /* Убираем стандартные внутренние отступы */
+  box-sizing: border-box;
+  /* border-box: padding и border включаются в заданную ширину/высоту.
+     Без этого width: 100% + padding = выход за пределы родителя */
+}
+
+/* ---- CSS-переменные (кастомные свойства) ----
+   Задаём цветовую палитру проекта в одном месте.
+   При изменении цвета достаточно поменять только здесь — все элементы обновятся автоматически */
+:root {
+  --bg: #f8f6f2;
+  /* Основной фоновый цвет — тёплый бежевый, используется как фон страниц 2 и 0 */
+  --white: #ffffff;
+  /* Чистый белый — фон карточек, кнопок, некоторых страниц */
+  --dark: #1a1a1a;
+  /* Почти чёрный — основной цвет текста, фон шапки и карточек при hover */
+  --mid: #555555;
+  /* Средне-серый — вторичный текст (подзаголовки, биографии, описания) */
+  --light: #999999;
+  /* Светло-серый — малозначимый текст (примечания, копирайт формы) */
+  --accent: #c8a96e;
+  /* Золотистый — главный акцентный цвет: лейблы, иконки, рамки, активные ссылки */
+  --accent2: #8b6f47;
+  /* Тёмно-золотой — hover-состояние для кнопки .btn-primary.full */
+  --cta: #e6c84a;
+  /* Ярко-жёлтый — цвет кнопки CTA в навигации (.nav-btn) */
+  --cta-hover: #d4b438;
+  /* Чуть темнее CTA — hover-состояние для .nav-btn */
+  --border: #e4e0d8;
+  /* Тёплый светло-серый — цвет рамок, разделителей (border у карточек, полей формы) */
+}
+
+/* ---- Базовые стили html и body ---- */
+html,
+body {
+  width: 100%;
+  /* Явно задаём ширину 100% — на случай если есть внешние стили */
+  height: 100%;
+  /* Явно 100% высоты — нужно для работы страниц с position: fixed и height: 100% */
+  overflow: hidden;
+  /* Скрываем скролл на самом body/html.
+     Прокрутка каждой страницы происходит внутри .page через overflow-y: scroll.
+     Если здесь не скрыть overflow, появится двойной скроллбар */
+  font-family: "Georgia", serif;
+  /* Georgia — засечный шрифт. Создаёт "авторский", элегантный стиль для дизайн-студии.
+     serif — запасной вариант, если Georgia не установлена (хотя встроена во всех ОС) */
+  color: var(--dark);
+  /* Основной цвет текста — почти чёрный. Наследуется всеми дочерними элементами */
+  line-height: 1.7;
+  /* Межстрочный интервал 1.7 (170% от размера шрифта) — улучшает читаемость длинных текстов */
+}
+
+/* ---- Общий стиль ссылок ---- */
+a {
+  text-decoration: none;
+  /* Убираем стандартное подчёркивание ссылок — в дизайне подчёркивание добавляется только там, где нужно */
+  color: inherit;
+  /* Наследует цвет родителя вместо синего по умолчанию */
+  cursor: pointer;
+  /* Явно задаём указатель-руку (по умолчанию у <a> он и так pointer, но явное лучше) */
+}
+
+/* ---- Общий контейнер ширины ---- */
+.container {
+  max-width: 1200px;
+  /* Ограничение ширины контента — на широких мониторах контент не растягивается в бесконечную строку */
+  margin: 0 auto;
+  /* Центрирование блока по горизонтали */
+  padding: 0 32px;
+  /* Боковые отступы — чтобы контент не прилипал к краям экрана */
+}
+
+/* ===================== PAGES =====================
+   Система "стека страниц" — каждая страница занимает весь экран
+   и перекрывает предыдущую. Навигация = анимация transform по Y-оси
+*/
+.page {
+  position: fixed;
+  /* position: fixed — страница "приклеена" к экрану, не двигается при обычном скролле.
+     Именно фиксированные страницы позволяют анимировать переход между ними через transform,
+     не затрагивая нативный скролл браузера */
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  /* top/left/right/bottom: 0 = inset: 0 — страница занимает ВЕСЬ viewport */
+  width: 100%;
+  height: 100%;
+  /* Дублируем ширину/высоту явно для надёжности в старых браузерах */
+  overflow-y: scroll;
+  /* overflow-y: scroll (не auto!) — ГАРАНТИРУЕТ создание scroll-контейнера.
+     auto не создаёт scroll-context в iOS Safari, что ломает -webkit-overflow-scrolling: touch.
+     Прокрутка внутри страницы (текст длиннее экрана) работает именно через это свойство */
+  overflow-x: hidden;
+  /* Скрываем горизонтальный скролл — контент спроектирован без горизонтального переполнения */
+  -webkit-overflow-scrolling: touch;
+  /* Нативная инерционная прокрутка на iOS — без этого скролл "резиновый" и медленный на iPhone/iPad */
+  transition: transform 0.75s cubic-bezier(0.77, 0, 0.175, 1);
+  /* Анимация перехода между страницами.
+     0.75s — достаточно долго для плавности, не слишком долго для UX.
+     cubic-bezier(0.77, 0, 0.175, 1) — "ease-in-out" кривая с резким ускорением и торможением,
+     создаёт кинематографический эффект slide */
+  will-change: transform;
+  /* Подсказка браузеру: этот элемент будет анимироваться через transform.
+     Браузер заранее переносит его на GPU-слой (compositing layer),
+     что делает анимацию гладкой (60fps) и не вызывает перерисовку других элементов */
+}
+
+/* ---- Страница 0: Главная ---- */
+.page[data-page="0"] {
+  z-index: 10;
+  /* Самый низкий z-index в стеке — "дно".
+     Страницы 1–4 имеют z-index 20–50 и визуально "перекрывают" её при переходе */
+  transform: translateY(0);
+  /* Нулевое смещение — страница 0 видна при загрузке */
+  background: var(--dark);
+  /* Тёмный фон — основной экран с hero-изображением (задаётся в .hero, не здесь) */
+}
+
+/* ---- Страница 1: О студии ---- */
+.page[data-page="1"] {
+  z-index: 20;
+  /* Выше страницы 0 — при переходе "выезжает" поверх */
+  transform: translateY(100%);
+  /* Начальное положение — за нижним краем экрана (скрыта).
+     JS устанавливает translateY(0) для показа */
+  background-color: var(--white);
+  /* Белый фон — показывается пока грузится фоновая картинка (fallback) */
+  background-image: url("https://images.unsplash.com/photo-1560448204-603b3fc33ddc?auto=format&fit=crop&w=1920&q=60");
+  /* Фоновое изображение интерьера. w=1920 — HD-качество для полного экрана. q=60 — компромисс */
+  background-size: cover;
+  /* cover — изображение масштабируется так, чтобы покрыть весь блок, сохраняя пропорции */
+  background-position: center;
+  /* Центрирует изображение в блоке при обрезке */
+}
+.page[data-page="1"]::before {
+  content: "";
+  /* Псевдоэлемент ::before — создаёт "виртуальный" дополнительный слой без HTML-элемента */
+  position: absolute;
+  inset: 0;
+  /* inset: 0 = top: 0; right: 0; bottom: 0; left: 0 — покрывает весь родитель */
+  background: rgba(255, 255, 255, 0.82);
+  /* Белый полупрозрачный overlay (82% непрозрачности) поверх фонового фото.
+     Делает текст читаемым, сохраняя едва заметную текстуру фона */
+  pointer-events: none;
+  /* Overlay не перехватывает клики — клики "проходят" к контенту ниже */
+  z-index: 0;
+  /* Overlay ниже .page-inner (z-index: 1), чтобы контент был поверх него */
+}
+.page[data-page="1"] .page-inner {
+  position: relative;
+  /* relative нужен для z-index — без него z-index: 1 не работает */
+  z-index: 1;
+  /* Контент страницы поверх белого overlay */
+}
+
+/* ---- Страница 2: Портфолио ---- */
+.page[data-page="2"] {
+  z-index: 30;
+  /* На единицу выше страницы 1 — правильный порядок стека */
+  transform: translateY(100%);
+  /* Скрыта за нижним краем */
+  background-color: var(--bg);
+  /* Бежевый fallback-фон пока не загрузилось фото */
+  background-image: url("https://images.unsplash.com/photo-1615529182904-14819c35db37?auto=format&fit=crop&w=1920&q=60");
+  background-size: cover;
+  background-position: center;
+}
+.page[data-page="2"]::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: rgba(248, 246, 242, 0.78);
+  /* Бежевый overlay (цвет --bg) с прозрачностью 78% — создаёт тёплый тон страницы портфолио */
+  pointer-events: none;
+  z-index: 0;
+}
+.page[data-page="2"] .page-inner {
+  position: relative;
+  z-index: 1;
+}
+
+/* ---- Страница 3: Команда ---- */
+.page[data-page="3"] {
+  z-index: 40;
+  transform: translateY(100%);
+  background-color: var(--white);
+  background-image: url("https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?auto=format&fit=crop&w=1920&q=60");
+  background-size: cover;
+  background-position: center;
+}
+.page[data-page="3"]::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: rgba(255, 255, 255, 0.87);
+  /* Почти непрозрачный белый overlay (87%) — страница команды текстовая, фон должен почти не отвлекать */
+  pointer-events: none;
+  z-index: 0;
+}
+.page[data-page="3"] .page-inner {
+  position: relative;
+  z-index: 1;
+}
+
+/* ---- Страница 4: Форма заказа ---- */
+.page[data-page="4"] {
+  z-index: 50;
+  /* Самый высокий z-index — последняя страница в стеке, "вершина" */
+  transform: translateY(100%);
+  background-color: var(--white);
+  background-image: url("https://images.unsplash.com/photo-1556909114-44e3e70034e2?auto=format&fit=crop&w=1920&q=60");
+  background-size: cover;
+  background-position: center;
+}
+.page[data-page="4"]::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: rgba(255, 255, 255, 0.88);
+  /* 88% — форма требует максимальной читаемости, фон почти скрыт */
+  pointer-events: none;
+  z-index: 0;
+}
+.page[data-page="4"] .page-inner {
+  position: relative;
+  z-index: 1;
+  padding-top: 80px;
+  /* Уменьшенный верхний отступ (стандартный 100px) — чтобы форма + футер уместились в экран */
+  padding-bottom: 16px;
+  /* Минимальный нижний отступ — футер прижат к низу через margin-top: auto */
+}
+
+/* ---- Базовый внутренний контейнер страниц ----
+   Используется на страницах 1–4 как обёртка контента */
+.page-inner {
+  min-height: 100vh;
+  /* Минимальная высота — весь экран, чтобы гарантировать что контент и футер распределены по экрану */
+  padding: 100px 0 60px;
+  /* padding-top: 100px — отступ от фиксированной шапки (высота шапки 72px + запас).
+     padding-bottom: 60px — отступ снизу */
+  display: flex;
+  flex-direction: column;
+  /* Вертикальный flex для .page-inner: позволяет footer получить margin-top: auto
+     и "прилипнуть" к низу экрана */
+}
+
+/* ===================== HEADER ===================== */
+.header {
+  position: fixed;
+  /* Шапка всегда прикреплена к верху экрана, не прокручивается вместе с контентом страницы */
+  top: 0;
+  left: 0;
+  right: 0;
+  /* Растягивается на всю ширину экрана */
+  z-index: 1000;
+  /* Поверх всех страниц (z-index 10–50) и индикатора точек (999) */
+  background: rgba(26, 26, 26, 0.92);
+  /* Тёмный полупрозрачный фон — на тёмной главной странице шапка не выделяется резко */
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
+  /* Размытие фона под шапкой — эффект "матового стекла" (frosted glass).
+     -webkit- префикс для Safari. Работает только если background имеет прозрачность */
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  /* Едва заметная светлая линия снизу — визуально отделяет шапку от контента на тёмном фоне */
+  transition:
+    background 0.4s,
+    border-color 0.4s;
+  /* Плавный переход цвета шапки при смене страницы (JS добавляет/убирает .light).
+     0.4s — чуть короче анимации страниц (0.75s) для своевременного обновления */
+}
+
+/* Светлая тема шапки (страницы 1–4 с белым фоном) */
+.header.light {
+  background: rgba(248, 246, 242, 0.95);
+  /* Тёплый белый фон вместо тёмного — шапка адаптируется к светлым страницам */
+  border-bottom-color: var(--border);
+  /* Видимая разделительная линия на светлом фоне */
+}
+
+/* Внутренний контейнер шапки */
+.header-inner {
+  max-width: 1200px;
+  /* Ограничение ширины, как у .container */
+  margin: 0 auto;
+  padding: 0 32px;
+  height: 72px;
+  /* Фиксированная высота шапки — отступы страниц (padding-top: 100px) рассчитаны под неё */
+  display: flex;
+  align-items: center;
+  /* Вертикальное выравнивание по центру: логотип, навигация, бургер — на одной оси */
+  justify-content: space-between;
+  /* Логотип — слева, кнопки — справа, навигация — между ними */
+}
+
+/* Логотип */
+.logo {
+  font-size: 22px;
+  font-weight: bold;
+  letter-spacing: 4px;
+  /* Большая разрядка букв — создаёт монограммный, фирменный стиль */
+  color: var(--white);
+  /* Белый на тёмном фоне шапки */
+  transition: color 0.4s;
+  /* Плавная смена цвета при переключении темы шапки */
+}
+
+/* Логотип в светлой теме */
+.header.light .logo {
+  color: var(--dark);
+  /* Тёмный на светлом фоне */
+}
+
+/* Навигационный список */
+.nav {
+  display: flex;
+  align-items: center;
+  gap: 36px;
+  /* Отступ между ссылками навигации */
+}
+
+/* Ссылки навигации */
+.nav-link {
+  font-family: Arial, sans-serif;
+  /* Arial для навигации — sans-serif контрастирует с Georgia основного текста */
+  font-size: 14px;
+  letter-spacing: 1px;
+  color: rgba(255, 255, 255, 0.65);
+  /* Полупрозрачный белый — неактивные ссылки чуть приглушены */
+  transition: color 0.2s;
+  position: relative;
+  /* relative для позиционирования псевдоэлемента ::after (подчёркивание) */
+}
+
+/* Декоративное подчёркивание под ссылками навигации */
+.nav-link::after {
+  content: "";
+  position: absolute;
+  bottom: -4px;
+  /* На 4px ниже текста ссылки */
+  left: 0;
+  width: 0;
+  /* Начальная ширина 0 — подчёркивание скрыто */
+  height: 1px;
+  background: var(--accent);
+  /* Золотистая линия */
+  transition: width 0.3s;
+  /* Анимация появления: ширина плавно увеличивается от 0 до 100% */
+}
+
+/* Hover и активное состояние ссылок */
+.nav-link:hover,
+.nav-link.active {
+  color: var(--white);
+  /* Полностью белый при наведении или активности */
+}
+.nav-link:hover::after,
+.nav-link.active::after {
+  width: 100%;
+  /* Подчёркивание разворачивается на всю ширину ссылки */
+}
+
+/* Ссылки в светлой теме шапки */
+.header.light .nav-link {
+  color: var(--mid);
+  /* Серый вместо полупрозрачного белого */
+}
+.header.light .nav-link:hover,
+.header.light .nav-link.active {
+  color: var(--dark);
+  /* Тёмный при активности на светлом фоне */
+}
+
+/* Кнопка CTA в навигации */
+.nav-btn {
+  font-family: Arial, sans-serif;
+  font-size: 13px;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  /* Заглавные буквы — выделяет CTA среди обычных ссылок */
+  padding: 10px 24px;
+  border: 1px solid var(--cta);
+  background: var(--cta);
+  /* Жёлтый фон — максимальный контраст для кнопки действия */
+  color: var(--dark);
+  /* Тёмный текст на жёлтом — хорошая читаемость */
+  transition:
+    background 0.2s,
+    color 0.2s,
+    border-color 0.2s;
+}
+
+/* Hover для CTA-кнопки */
+.nav-btn:hover {
+  background: var(--cta-hover);
+  /* Чуть темнее жёлтый при наведении */
+  border-color: var(--cta-hover);
+  color: var(--dark);
+}
+/* CTA-кнопка в светлой теме (поведение не меняется — кнопка всегда жёлтая) */
+.header.light .nav-btn {
+  background: var(--cta);
+  border-color: var(--cta);
+  color: var(--dark);
+}
+.header.light .nav-btn:hover {
+  background: var(--cta-hover);
+  border-color: var(--cta-hover);
+  color: var(--dark);
+}
+
+/* Кнопка-бургер для мобильного меню */
+.burger {
+  display: none;
+  /* Скрыта на десктопе — показывается только на мобильных (<=768px) */
+  background: none;
+  border: none;
+  font-size: 22px;
+  cursor: pointer;
+  color: var(--white);
+}
+
+/* Бургер в светлой теме */
+.header.light .burger {
+  color: var(--dark);
+}
+
+/* ===================== PAGE DOTS ===================== */
+.page-dots {
+  position: fixed;
+  /* Фиксируется относительно экрана, не страницы */
+  right: 28px;
+  /* У правого края */
+  top: 50%;
+  transform: translateY(-50%);
+  /* Трюк вертикального центрирования: top: 50% + translateY(-50%) = точно по центру.
+     Нельзя использовать только top: 50%, так как элемент позиционируется от своего верхнего края */
+  z-index: 999;
+  /* Ниже шапки (1000), но выше страниц (10–50) */
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  /* Вертикальный список точек с зазором 10px */
+}
+
+/* Одна точка */
+.dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  /* Превращает квадрат 8x8 в круг */
+  background: rgba(0, 0, 0, 0.3);
+  /* Полупрозрачный тёмный — нейтральный цвет для неактивных точек */
+  cursor: pointer;
+  transition:
+    background 0.3s,
+    transform 0.3s;
+  /* Плавное изменение цвета и размера при активации */
+}
+
+/* Активная точка */
+.dot.active {
+  background: #1a1a1a;
+  /* Тёмный непрозрачный — JS дополнительно меняет цвет через inline style при тёмных/светлых страницах */
+  transform: scale(1.4);
+  /* Увеличение активной точки на 40% — визуальная индикация текущей страницы */
+}
+
+/* ===================== BUTTONS ===================== */
+.btn-primary {
+  display: inline-block;
+  /* inline-block позволяет задавать padding и размер у ссылки (<a>), которая по умолчанию inline */
+  font-family: Arial, sans-serif;
+  font-size: 13px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  padding: 14px 36px;
+  /* Щедрый padding — кнопка выглядит значимой */
+  background: var(--white);
+  /* Белая кнопка на тёмном hero-фоне главной страницы */
+  color: var(--dark);
+  border: none;
+  cursor: pointer;
+  transition:
+    background 0.2s,
+    color 0.2s;
+}
+
+/* Hover основной кнопки */
+.btn-primary:hover {
+  background: var(--accent);
+  /* Золотистый фон при наведении */
+  color: var(--white);
+  /* Белый текст на золотом */
+}
+
+/* Модификатор "на всю ширину" — используется в форме */
+.btn-primary.full {
+  width: 100%;
+  text-align: center;
+  background: var(--dark);
+  /* В форме кнопка тёмная (не белая) — контрастирует со светлым фоном */
+  color: var(--white);
+}
+.btn-primary.full:hover {
+  background: var(--accent2);
+  /* Тёмно-золотой hover для тёмной кнопки */
+}
+
+/* ===================== FOCUS ===================== */
+:focus-visible {
+  outline: 2px solid var(--accent);
+  /* Золотистый outline при навигации с клавиатуры — важно для доступности (a11y).
+     :focus-visible срабатывает только при клавиатурной навигации, не при кликах мышью */
+  outline-offset: 3px;
+  /* Отступ outline от границы элемента — outline не "налезает" на элемент */
+}
+/* Поля формы имеют собственный стиль фокуса (border-color: --accent), outline им не нужен */
+.form-group input:focus-visible,
+.form-group select:focus-visible,
+.form-group textarea:focus-visible {
+  outline: none;
+}
+
+
+/* ===================== SECTION LABELS =====================
+   Маленькие подписи-категории над заголовками секций (например "О студии", "Наши работы")
+*/
+.section-label {
+  font-family: Arial, sans-serif;
+  font-size: 11px;
+  letter-spacing: 3px;
+  /* Большая разрядка создаёт стиль "капсульного лейбла" */
+  text-transform: uppercase;
+  color: var(--accent);
+  /* Золотистый — выделяется как цветовой акцент */
+  margin-bottom: 12px;
+}
+
+/* Заголовок секции */
+.section-title {
+  font-size: clamp(24px, 3vw, 40px);
+  /* clamp(min, предпочтительный, max): минимум 24px, 3% ширины вьюпорта, максимум 40px.
+     Адаптивный размер без медиазапросов — на узких экранах меньше, на широких — больше */
+  font-weight: normal;
+  /* Для шрифта Georgia нормальный вес выглядит элегантно — жирный был бы грубее */
+  line-height: 1.25;
+  /* Плотный межстрочный интервал для крупных заголовков */
+  color: var(--dark);
+  margin-bottom: 20px;
+}
+
+/* Подзаголовок секции */
+.section-sub {
+  font-family: Arial, sans-serif;
+  font-size: 15px;
+  color: var(--mid);
+  /* Серый — менее важный, чем заголовок */
+  margin-bottom: 40px;
+}
+
+/* Подсказка в портфолио */
+.portfolio-hint {
+  font-size: 17px;
+  /* Крупнее обычного section-sub — подсказка важна для UX */
+  color: var(--dark);
+  /* Тёмный вместо серого — привлекает больше внимания */
+  letter-spacing: 0.3px;
+}
+
+/* ===================== PAGE 0: HERO ===================== */
+.hero {
+  min-height: 100vh;
+  /* На весь экран по высоте — классический fullscreen hero */
+  display: flex;
+  align-items: center;
+  /* Вертикальное центрирование hero-контента */
+  padding-top: 72px;
+  /* Компенсация высоты фиксированной шапки — контент не прячется за шапкой */
+  position: relative;
+  /* relative для псевдоэлемента ::before (overlay) */
+  background-image: url("https://images.unsplash.com/photo-1586023492125-27b2c045efd7?auto=format&fit=crop&w=1920&q=70");
+  /* Фоновое изображение интерьера. q=70 — чуть лучше качество, чем у остальных (главный экран важнее) */
+  background-size: cover;
+  background-position: center;
+}
+
+/* Затемняющий overlay поверх hero-изображения */
+.hero::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: rgba(15, 15, 15, 0.72);
+  /* Тёмный overlay 72% — сильнее, чем на остальных страницах:
+     белый текст должен хорошо читаться на любом фоновом фото */
+  pointer-events: none;
+  /* Overlay не блокирует клики на кнопку "Обсудить проект" */
+}
+
+/* Контент hero-секции */
+.hero-content {
+  position: relative;
+  z-index: 1;
+  /* Поверх тёмного overlay */
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 32px;
+  /* Центрирование и боковые отступы — как у .container */
+}
+
+/* Маленький лейбл над заголовком */
+.hero-tag {
+  font-family: Arial, sans-serif;
+  font-size: 11px;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: var(--accent);
+  /* Золотистый — акцентный цвет */
+  margin-bottom: 24px;
+}
+
+/* Главный заголовок hero */
+.hero-title {
+  font-size: clamp(36px, 6vw, 78px);
+  /* Очень крупный адаптивный заголовок: от 36px на телефоне до 78px на большом мониторе */
+  font-weight: normal;
+  line-height: 1.1;
+  /* Плотный интервал для крупного заголовка — строки не разваливаются */
+  color: var(--white);
+  margin-bottom: 28px;
+  max-width: 800px;
+  /* Ограничение ширины — длинный заголовок не растягивается на весь экран */
+}
+
+/* Подзаголовок hero */
+.hero-sub {
+  font-family: Arial, sans-serif;
+  font-size: 16px;
+  color: rgba(255, 255, 255, 0.6);
+  /* 60% белого — визуально "тише" основного заголовка */
+  max-width: 480px;
+  /* Ограничение ширины для читаемости */
+  margin-bottom: 44px;
+  line-height: 1.8;
+}
+
+/* ===================== ABOUT STATS ===================== */
+.about-stats {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  /* Два столбца равной ширины — 4 цифры в сетке 2x2 */
+  gap: 28px;
+}
+
+/* Одна ячейка статистики */
+.stat {
+  border-top: 1px solid var(--border);
+  /* Тонкая линия сверху визуально отделяет каждую метрику */
+  padding-top: 18px;
+}
+
+/* Большое число */
+.stat-num {
+  display: block;
+  /* block — для margin-bottom (inline-элемент не поддерживает вертикальные отступы) */
+  font-size: 40px;
+  color: var(--accent);
+  /* Золотистый — числа выделяются как ключевые данные */
+  line-height: 1;
+  margin-bottom: 6px;
+}
+
+/* Подпись под числом */
+.stat-label {
+  font-family: Arial, sans-serif;
+  font-size: 13px;
+  color: var(--mid);
+  /* Серый — менее важный элемент */
+}
+
+/* ===================== SERVICES ===================== */
+.services-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  /* 4 равных столбца — по одной карточке услуги */
+  gap: 2px;
+  /* Минимальный зазор между карточками создаёт эффект "плитки" */
+}
+
+/* Карточка услуги */
+.service-card {
+  background: var(--white);
+  padding: 36px 28px;
+  transition: background 0.2s;
+  /* Плавная смена фона при hover */
+}
+
+/* Hover-инверсия: тёмный фон, светлый текст */
+.service-card:hover {
+  background: var(--dark);
+}
+.service-card:hover .service-icon,
+.service-card:hover h3,
+.service-card:hover p {
+  color: var(--white);
+  /* Все дочерние элементы становятся белыми при hover родителя */
+}
+.service-card:hover .service-icon {
+  color: var(--accent);
+  /* Иконка при hover остаётся золотистой (переопределяет предыдущее правило) — сохраняет акцент */
+}
+
+/* Иконка услуги (Unicode-символ) */
+.service-icon {
+  font-size: 26px;
+  color: var(--accent);
+  margin-bottom: 18px;
+  display: block;
+  /* block для margin-bottom */
+  transition: color 0.2s;
+}
+
+/* Заголовок карточки услуги */
+.service-card h3 {
+  font-size: 17px;
+  font-weight: normal;
+  margin-bottom: 10px;
+  transition: color 0.2s;
+}
+
+/* Текст карточки услуги */
+.service-card p {
+  font-family: Arial, sans-serif;
+  font-size: 13px;
+  color: var(--mid);
+  line-height: 1.7;
+  transition: color 0.2s;
+}
+
+/* ===================== PAGE 1: О СТУДИИ ===================== */
+.about-page {
+  padding: 0;
+  /* Обнуляем стандартный padding .page-inner — макет О студии сам управляет отступами */
+}
+
+/* Двухколоночный макет страницы О студии */
+.about-page-layout {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  /* 50% / 50% — равные колонки для фото и текста */
+  min-height: 100vh;
+  /* На весь экран по высоте */
+}
+
+/* Левая колонка (фото) */
+.about-page-left {
+  position: relative;
+  /* Для возможного использования абсолютного позиционирования внутри */
+  overflow: hidden;
+  /* Обрезает изображение по границам колонки */
+}
+
+/* Обёртка изображения */
+.about-img-wrap {
+  width: 100%;
+  height: 100%;
+  /* Растягивается на всю высоту и ширину колонки */
+}
+
+/* Изображение на странице О студии */
+.about-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  /* Заполняет блок, обрезая лишнее — без деформации пропорций */
+  display: block;
+  /* Убирает пробел под изображением (inline-элементы имеют baseline) */
+  border: 4px solid rgba(200, 169, 110, 0.75);
+  /* Золотистая рамка — фирменная деталь дизайна, повторяется у всех фото проекта */
+  box-sizing: border-box;
+  /* border не увеличивает размер изображения (рамка "внутрь") */
+}
+
+/* Правая колонка (текст) */
+.about-page-right {
+  padding: 100px 56px 40px;
+  /* padding-top: 100px — отступ от шапки. 56px по бокам — воздух вокруг текста */
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  /* Центрируем текстовый блок вертикально в правой колонке */
+}
+
+/* Вводный абзац текста */
+.about-lead {
+  font-family: Arial, sans-serif;
+  font-size: 14px;
+  color: var(--mid);
+  line-height: 1.8;
+  margin-bottom: 14px;
+}
+
+/* Компактная версия сетки услуг (для страницы О студии) */
+.services-grid.compact {
+  margin-top: 12px;
+  gap: 2px;
+  /* Такой же минимальный зазор, как в основной сетке */
+}
+
+/* Компактные карточки — уменьшенные отступы и шрифты */
+.services-grid.compact .service-card {
+  padding: 20px 18px;
+  /* В 2 раза меньше стандартного — сжатый вид */
+}
+
+.services-grid.compact .service-icon {
+  font-size: 20px;
+  /* Иконка меньше */
+  margin-bottom: 8px;
+}
+.services-grid.compact h3 {
+  font-size: 14px;
+  /* Заголовок меньше */
+  margin-bottom: 4px;
+}
+.services-grid.compact p {
+  font-size: 12px;
+  /* Текст меньше */
+}
+
+/* ===================== PAGE 2: ПОРТФОЛИО ===================== */
+.portfolio-page {
+  padding: 0;
+  /* Своя компоновка — не нужен стандартный padding .page-inner */
+}
+
+/* Шапка секции портфолио */
+.portfolio-header {
+  padding: 88px 40px 28px;
+  /* 88px сверху — отступ от шапки + небольшой запас. 28px снизу до сетки */
+}
+
+/* Сетка карточек портфолио */
+.portfolio-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  /* 4 равных столбца для 4 проектов */
+  gap: 23px;
+  /* Заметный зазор между карточками — "вентиляция" галереи */
+  width: 100%;
+  padding: 0 25px 25px;
+  /* Горизонтальные отступы по краям, 25px снизу */
+}
+
+/* Карточка проекта */
+.portfolio-item {
+  position: relative;
+  /* Для абсолютно позиционированного .portfolio-overlay */
+  cursor: pointer;
+  overflow: hidden;
+  /* Обрезает увеличивающееся при hover изображение (zoom-эффект) */
+  aspect-ratio: 4/5;
+  /* Вертикальное соотношение сторон — карточки выше, чем шире. Создаёт "портретный" формат */
+  border: 4px solid rgba(200, 169, 110, 0.75);
+  /* Золотистая рамка — единый стиль всех фото на сайте */
+  box-shadow:
+    0 6px 24px rgba(0, 0, 0, 0.18),
+    /* Внешняя тень — глубина и объём */
+    inset 0 0 0 1px rgba(255, 255, 255, 0.15);
+    /* Внутренняя светлая граница — тонкая деталь для объёма */
+  transition:
+    border-color 0.3s,
+    box-shadow 0.3s;
+}
+
+/* Hover карточки портфолио */
+.portfolio-item:hover {
+  border-color: var(--accent);
+  /* Рамка становится ярко-золотой */
+  box-shadow:
+    0 12px 36px rgba(0, 0, 0, 0.28),
+    /* Тень становится глубже и шире */
+    inset 0 0 0 1px rgba(255, 255, 255, 0.2);
+}
+
+/* Блок с фоновым изображением проекта */
+.portfolio-placeholder {
+  width: 100%;
+  height: 100%;
+  background-size: cover;
+  background-position: center;
+  transition: transform 0.5s ease;
+  /* Медленнее, чем большинство переходов (0.5s) — плавный zoom-эффект */
+}
+
+/* Конкретные фоновые изображения для каждого проекта */
+.p0 {
+  background-image: url("https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=800&q=75");
+  /* Квартира на Арбате */
+}
+.p1 {
+  background-image: url("https://images.unsplash.com/photo-1567767292278-a4f21aa2d36e?auto=format&fit=crop&w=800&q=75");
+  /* Загородный дом */
+}
+.p2 {
+  background-image: url("https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?auto=format&fit=crop&w=800&q=75");
+  /* Пентхаус Skyline */
+}
+.p3 {
+  background-image: url("https://images.unsplash.com/photo-1414235077428-338989a2e8c0?auto=format&fit=crop&w=800&q=75");
+  /* Ресторан «Бамбук» */
+}
+
+/* Zoom изображения при hover на карточку */
+.portfolio-item:hover .portfolio-placeholder {
+  transform: scale(1.06);
+  /* 6% увеличение — заметный, но не чрезмерный zoom */
+}
+
+/* Overlay с информацией о проекте (выезжает снизу при hover) */
+.portfolio-overlay {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  /* Прикреплён к нижнему краю карточки */
+  padding: 18px 14px;
+  background: linear-gradient(transparent, rgba(26, 26, 26, 0.85));
+  /* Gradient от прозрачного сверху к тёмному снизу — текст читается, но не перекрывает фото */
+  transform: translateY(100%);
+  /* Скрыт за нижним краем карточки */
+  transition: transform 0.3s ease;
+  /* Плавное выезжание */
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+/* Overlay виден при hover */
+.portfolio-item:hover .portfolio-overlay {
+  transform: translateY(0);
+  /* Выезжает на место */
+}
+
+/* На тач-устройствах overlay всегда виден (нет hover) */
+@media (hover: none) {
+  .portfolio-overlay {
+    transform: translateY(0);
+    /* CSS media query определяет поддержку hover (мышь).
+       На мобильных/планшетах hover: none — overlay постоянно показан */
+  }
+}
+
+/* Название проекта в overlay */
+.portfolio-title {
+  color: #fff;
+  font-size: 14px;
+}
+
+/* Мета-информация (город, площадь) */
+.portfolio-meta {
+  font-family: Arial, sans-serif;
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.65);
+  /* Полупрозрачный белый — менее важная информация */
+}
+
+/* ===================== LIGHTBOX ===================== */
+.lightbox {
+  position: fixed;
+  inset: 0;
+  /* Весь экран */
+  z-index: 5000;
+  /* Выше всех страниц (50) и шапки (1000) */
+  background: rgba(10, 10, 10, 0.96);
+  /* Почти чёрный фон — галерейный режим */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  /* Центрирование контента */
+  opacity: 0;
+  pointer-events: none;
+  /* Скрыт и не перехватывает клики — пока не открыт */
+  transition: opacity 0.3s;
+  /* Плавное появление/исчезновение */
+}
+
+/* Открытый лайтбокс */
+.lightbox.open {
+  opacity: 1;
+  pointer-events: auto;
+  /* Становится видимым и интерактивным */
+}
+
+/* Общие стили кнопок лайтбокса */
+.lb-close,
+.lb-prev,
+.lb-next {
+  position: absolute;
+  /* Все кнопки абсолютно позиционированы относительно лайтбокса */
+  background: none;
+  border: none;
+  color: #fff;
+  cursor: pointer;
+  transition: color 0.2s;
+}
+
+/* Кнопка закрытия */
+.lb-close {
+  top: 24px;
+  right: 32px;
+  /* Правый верхний угол */
+  font-size: 22px;
+}
+/* Кнопка "назад" */
+.lb-prev {
+  left: 32px;
+  top: 50%;
+  transform: translateY(-50%);
+  /* Вертикальное центрирование кнопки стрелки */
+  font-size: 30px;
+}
+/* Кнопка "вперёд" */
+.lb-next {
+  right: 32px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 30px;
+}
+/* Hover всех кнопок лайтбокса */
+.lb-close:hover,
+.lb-prev:hover,
+.lb-next:hover {
+  color: var(--accent);
+  /* Золотистый при наведении — фирменный акцент */
+}
+
+/* Контейнер изображения и мета-информации */
+.lb-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+  /* Отступ между изображением и подписью */
+}
+
+/* Большое изображение в лайтбоксе */
+.lb-image {
+  width: 560px;
+  height: 380px;
+  max-width: 80vw;
+  /* Не более 80% ширины вьюпорта — не выходит за экран */
+  max-height: 55vh;
+  /* Не более 55% высоты — оставляет место для кнопок, подписи и миниатюр */
+  object-fit: cover;
+  display: block;
+}
+
+/* Блок с подписью к изображению */
+.lb-meta {
+  text-align: center;
+}
+/* Название проекта */
+.lb-title {
+  font-size: 20px;
+  color: #fff;
+  margin-bottom: 4px;
+}
+/* Описание проекта */
+.lb-desc {
+  font-family: Arial, sans-serif;
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.5);
+  /* Приглушённый белый — менее важная информация */
+}
+
+/* Счётчик "1 / 4" */
+.lb-counter {
+  font-family: Arial, sans-serif;
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.35);
+  /* Очень приглушённый — не отвлекает от изображения */
+  letter-spacing: 2px;
+  margin-top: 8px;
+}
+
+/* Контейнер миниатюр */
+.lb-thumbs {
+  display: flex;
+  gap: 7px;
+  margin-top: 14px;
+  flex-wrap: wrap;
+  /* Перенос миниатюр на новую строку если не помещаются */
+  justify-content: center;
+  max-width: 600px;
+}
+
+/* Миниатюра проекта */
+.lb-thumb {
+  width: 46px;
+  height: 34px;
+  background: #333;
+  /* Серый фон пока не загружена картинка */
+  cursor: pointer;
+  border: 2px solid transparent;
+  /* Прозрачная рамка — место для активной рамки без сдвига элемента */
+  transition: border-color 0.2s;
+}
+
+/* Активная миниатюра */
+.lb-thumb.active {
+  border-color: var(--accent);
+  /* Золотистая рамка — текущее изображение */
+}
+
+/* ===================== TEAM ===================== */
+/* Страница команды: уменьшенный верхний отступ для компактности */
+.page[data-page="3"] .page-inner {
+  padding-top: 80px;
+  /* 80px вместо стандартных 100px — 6 карточек должны поместиться на экране */
+  padding-bottom: 16px;
+}
+
+/* Уменьшенный отступ под подзаголовком на странице команды */
+.page[data-page="3"] .section-sub {
+  margin-bottom: 16px;
+  /* Стандартный 40px был бы слишком большим — нужно место для 6 карточек */
+}
+
+/* Сетка карточек команды */
+.team-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  /* 3 колонки — 6 карточек в два ряда */
+  gap: 12px;
+  /* Компактный зазор — карточек много, нужно экономить пространство */
+}
+
+/* Карточка члена команды */
+.team-card {
+  border: 1px solid var(--border);
+  /* Тонкая рамка — визуальное разделение карточек */
+  background: #ffffff;
+  padding: 14px 16px;
+  /* Компактный padding — карточки небольшие */
+  display: flex;
+  gap: 12px;
+  /* Аватар + текст рядом */
+  transition:
+    box-shadow 0.2s,
+    transform 0.2s;
+}
+
+/* Hover-эффект карточки */
+.team-card:hover {
+  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.08);
+  /* Мягкая тень появляется при наведении */
+  transform: translateY(-3px);
+  /* Лёгкое поднятие вверх — создаёт ощущение "отрыва" */
+}
+
+/* Аватар с инициалами */
+.team-avatar {
+  width: 40px;
+  height: 40px;
+  min-width: 40px;
+  /* min-width: не сжимается при flex-layout, всегда 40px */
+  background: var(--dark);
+  color: var(--accent);
+  /* Тёмный фон + золотые инициалы — фирменный стиль */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  /* Центрирование текста внутри квадрата */
+  font-family: Arial, sans-serif;
+  font-size: 13px;
+  letter-spacing: 1px;
+  font-weight: bold;
+}
+
+/* Текстовая часть карточки */
+.team-info {
+  flex: 1;
+  /* Занимает всё оставшееся место рядом с аватаром */
+}
+/* Имя сотрудника */
+.team-name {
+  font-size: 15px;
+  font-weight: normal;
+  margin-bottom: 2px;
+}
+
+/* Должность сотрудника */
+.team-role {
+  font-family: Arial, sans-serif;
+  font-size: 10px;
+  /* Очень маленький — должность вторична по сравнению с именем */
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: var(--accent);
+  /* Золотистый — выделяет роль */
+  margin-bottom: 6px;
+}
+
+/* Биография */
+.team-bio {
+  font-family: Arial, sans-serif;
+  font-size: 12px;
+  /* Маленький — сжатый формат карточки */
+  color: var(--mid);
+  line-height: 1.5;
+  margin-bottom: 8px;
+}
+
+/* Контейнер тегов */
+.team-tags {
+  display: flex;
+  flex-wrap: wrap;
+  /* Теги переносятся на новую строку если не помещаются */
+  gap: 5px;
+}
+
+/* Один тег специализации */
+.team-tags span {
+  font-family: Arial, sans-serif;
+  font-size: 11px;
+  padding: 3px 9px;
+  border: 1px solid var(--border);
+  /* Рамка без заливки — "outline" стиль тега */
+  color: var(--mid);
+}
+
+/* ===================== ORDER ===================== */
+/* Двухколоночный макет страницы заказа */
+.order-inner {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  /* 50% / 50% — информация слева, форма справа */
+  gap: 72px;
+  /* Большой зазор — визуально разделяет информацию и форму */
+  align-items: start;
+  /* Колонки выравниваются по верхнему краю (не по центру или низу) */
+  padding: 80px 0 60px;
+}
+
+/* Обёртка декоративного изображения в левой колонке */
+.order-img-wrap {
+  margin-top: 28px;
+  overflow: hidden;
+  /* Обрезает изображение, предотвращая выход за блок */
+}
+
+/* Декоративное изображение интерьера */
+.order-img {
+  width: 100%;
+  height: 220px;
+  /* Фиксированная высота — изображение не занимает слишком много места */
+  object-fit: cover;
+  display: block;
+  filter: brightness(0.92) saturate(0.85);
+  /* Приглушение: яркость 92%, насыщенность 85% — изображение не отвлекает от формы */
+  border: 4px solid rgba(200, 169, 110, 0.75);
+  /* Единая золотистая рамка */
+  box-sizing: border-box;
+}
+
+/* Текстовые абзацы в левой колонке */
+.order-info p {
+  font-family: Arial, sans-serif;
+  font-size: 15px;
+  color: var(--mid);
+  line-height: 1.8;
+  margin-bottom: 28px;
+}
+
+/* Список преимуществ */
+.order-benefits {
+  list-style: none;
+  /* Убираем стандартные маркеры */
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+/* Один пункт преимуществ */
+.order-benefits li {
+  font-family: Arial, sans-serif;
+  font-size: 14px;
+  color: var(--dark);
+  /* Тёмный — важная информация, читается чётко */
+}
+
+/* Форма заказа */
+.order-form {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  /* Двухколоночная форма — имя + телефон в одной строке, email + тип объекта в другой */
+  gap: 18px;
+}
+
+/* Группа поля формы (label + input/select/textarea) */
+.form-group {
+  display: flex;
+  flex-direction: column;
+  /* label сверху, input снизу */
+  gap: 5px;
+}
+/* Поле на всю ширину формы */
+.form-group.full {
+  grid-column: 1 / -1;
+  /* Растягивается на ОБА столбца формы */
+}
+
+/* Подпись поля */
+.form-group label {
+  font-family: Arial, sans-serif;
+  font-size: 11px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: var(--mid);
+  /* Маленькая серая заглавная подпись — минималистичный стиль */
+}
+
+/* Поля ввода, выпадающий список, textarea */
+.form-group input,
+.form-group select,
+.form-group textarea {
+  font-family: "Georgia", serif;
+  /* Georgia для полей — единообразие с основным текстом сайта */
+  font-size: 15px;
+  padding: 11px 14px;
+  border: 1px solid var(--border);
+  /* Тонкая рамка — нейтральная, не агрессивная */
+  background: var(--white);
+  color: var(--dark);
+  outline: none;
+  /* Убираем стандартный браузерный outline — используем собственный (border-color) */
+  transition: border-color 0.2s;
+}
+
+/* Нередактируемая высота textarea */
+.form-group textarea {
+  resize: none;
+  /* Запрещаем пользователю изменять размер — не ломает макет */
+}
+
+/* Фокус на поле формы */
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus {
+  border-color: var(--accent);
+  /* Золотистая рамка при фокусе — подсвечивает активное поле */
+}
+
+/* Сноска о политике конфиденциальности */
+.form-note {
+  font-family: Arial, sans-serif;
+  font-size: 11px;
+  color: var(--light);
+  /* Светлый серый — второстепенная юридическая информация */
+  grid-column: 1 / -1;
+  /* Занимает оба столбца формы */
+  text-align: center;
+}
+/* Ссылка в сноске */
+.form-note a,
+.privacy-link {
+  color: inherit;
+  /* Тот же серый цвет, что у текста */
+  text-decoration: underline;
+  /* Подчёркивание — единственный способ выделить ссылку без изменения цвета */
+}
+
+
+/* ===================== FOOTER ===================== */
+.footer {
+  padding: 16px 0;
+  margin-top: auto;
+  /* auto margin в flex-column родителе (.page-inner) прижимает footer к нижнему краю.
+     Работает потому что .page-inner: display: flex; flex-direction: column */
+  text-align: center;
+}
+
+/* Текст копирайта */
+.footer-copy {
+  font-family: Arial, sans-serif;
+  font-size: 11px;
+  color: rgba(26, 26, 26, 0.35);
+  /* 35% прозрачности — едва заметный, не отвлекает */
+  text-align: center;
+  letter-spacing: 0.5px;
+}
+
+/* ===================== MODAL ===================== */
+.modal {
+  position: fixed;
+  inset: 0;
+  /* Весь экран */
+  z-index: 6000;
+  /* Выше лайтбокса (5000) — может показываться поверх всего */
+  background: rgba(0, 0, 0, 0.6);
+  /* Затемнение фона за модалкой */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  /* Центрирование белого блока модалки */
+}
+
+/* Скрытое состояние модалки */
+.modal.hidden {
+  display: none;
+  /* Простое скрытие через display (не opacity) — элемент полностью убирается из layout.
+     Используем display вместо opacity/visibility, так как нет анимации появления */
+}
+
+/* Белый блок содержимого модалки */
+.modal-box {
+  background: var(--white);
+  padding: 52px 44px;
+  /* Щедрые отступы — торжественный вид для подтверждения */
+  text-align: center;
+  max-width: 380px;
+  width: 90%;
+  /* 90% на мобильных чтобы не выходило за экран */
+}
+
+/* Декоративный символ в модалке */
+.modal-icon {
+  font-size: 28px;
+  color: var(--accent);
+  margin-bottom: 14px;
+}
+/* Заголовок модалки */
+.modal-box h3 {
+  font-size: 22px;
+  font-weight: normal;
+  margin-bottom: 10px;
+}
+/* Текст модалки */
+.modal-box p {
+  font-family: Arial, sans-serif;
+  font-size: 14px;
+  color: var(--mid);
+  margin-bottom: 24px;
+}
+
+/* ===================== RESPONSIVE: TABLET LANDSCAPE (<=1024px) =====================
+   Планшет горизонтальный — экран достаточно широкий, но не для 4 колонок
+*/
+@media (max-width: 1024px) {
+  /* Услуги: 4 -> 2 колонки */
+  .services-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  /* Портфолио: 4 -> 2 колонки */
+  .portfolio-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  /* Команда: 3 -> 2 колонки */
+  .team-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  /* Форма заказа: 2 колонки -> 1 (информация сверху, форма снизу) */
+  .order-inner {
+    grid-template-columns: 1fr;
+    gap: 40px;
+  }
+  /* Правая колонка страницы О студии: меньше боковых отступов */
+  .about-page-right {
+    padding: 80px 40px 40px;
+  }
+}
+
+/* ===================== RESPONSIVE: TABLET PORTRAIT (<=768px) =====================
+   Планшет вертикальный и большие телефоны
+*/
+@media (max-width: 768px) {
+  /* --- МОБИЛЬНАЯ НАВИГАЦИЯ --- */
+  .nav {
+    display: none;
+    /* Скрываем горизонтальную навигацию */
+    flex-direction: column;
+    /* При открытии — вертикальный список */
+    position: fixed;
+    /* Фиксированный дропдаун под шапкой */
+    top: 72px;
+    /* Ровно под шапкой (высота 72px) */
+    left: 0;
+    right: 0;
+    /* На всю ширину экрана */
+    background: var(--dark);
+    /* Тёмный фон для тёмной темы */
+    padding: 24px;
+    gap: 20px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    z-index: 999;
+    /* Под шапкой (1000), но над страницами */
+  }
+  /* Открытое меню — JS добавляет класс .open по клику на бургер */
+  .nav.open {
+    display: flex;
+  }
+
+  /* Light-theme mobile nav */
+  .header.light .nav {
+    background: rgba(248, 246, 242, 0.98);
+    /* Тёплый белый фон вместо тёмного */
+    border-bottom-color: var(--border);
+  }
+  .header.light .nav .nav-link {
+    color: var(--mid);
+  }
+  .header.light .nav .nav-link:hover,
+  .header.light .nav .nav-link.active {
+    color: var(--dark);
+  }
+
+  /* Показываем кнопку бургера */
+  .burger {
+    display: block;
+  }
+  /* Скрываем точки навигации — на мобильных нет места */
+  .page-dots {
+    display: none;
+  }
+
+  /* --- ABOUT PAGE --- */
+  /* Колонки в одну */
+  .about-page-layout {
+    grid-template-columns: 1fr;
+    min-height: auto;
+    /* Убираем min-height: 100vh — контент теперь вертикальный и прокручивается */
+  }
+  /* Фиксированная высота для фото */
+  .about-page-left {
+    height: 280px;
+    /* На мобильных фото не может занимать полную высоту экрана — задаём фиксированную */
+  }
+  .about-page-right {
+    padding: 32px 24px 40px;
+    overflow-y: visible;
+    /* Сбрасываем overflow на visible, чтобы контент прокручивался через родителя .page */
+  }
+
+  /* --- GRIDS --- */
+  .portfolio-grid {
+    grid-template-columns: repeat(2, 1fr);
+    /* 2 колонки портфолио на мобильном */
+    gap: 12px;
+    padding: 0 16px 20px;
+  }
+  .team-grid {
+    grid-template-columns: 1fr;
+    /* Команда: 1 колонка */
+  }
+  .services-grid,
+  .services-grid.compact {
+    grid-template-columns: repeat(2, 1fr);
+    /* Услуги: 2 колонки */
+  }
+  .about-stats {
+    grid-template-columns: repeat(2, 1fr);
+    /* Статистика остаётся 2 колонки */
+  }
+  .order-form {
+    grid-template-columns: 1fr;
+    /* Форма: все поля в один столбец */
+  }
+  .order-inner {
+    grid-template-columns: 1fr;
+    gap: 32px;
+    padding: 60px 0 40px;
+  }
+
+  /* --- PAGE INNER PADDING --- */
+  .page-inner {
+    padding: 80px 0 40px;
+    /* Уменьшаем верхний отступ на мобильном — шапка 72px + небольшой запас */
+  }
+
+  /* --- HERO --- */
+  .hero-content {
+    padding: 0 24px;
+    /* Меньше боковых отступов */
+  }
+  .hero-sub {
+    font-size: 14px;
+    margin-bottom: 32px;
+  }
+
+  /* --- PORTFOLIO HEADER --- */
+  .portfolio-header {
+    padding: 80px 24px 20px;
+  }
+  .portfolio-hint {
+    font-size: 14px;
+    /* Подсказка меньше на мобильном */
+  }
+
+  /* --- TEAM --- */
+  .page[data-page="3"] .page-inner,
+  .page[data-page="4"] .page-inner {
+    padding-top: 72px;
+    /* Шапка на мобильном ниже — меньше отступ */
+  }
+
+
+  /* --- LIGHTBOX --- */
+  .lb-image {
+    width: 90vw;
+    /* 90% ширины экрана на мобильном */
+    height: auto;
+    /* Авто-высота — сохраняем пропорции */
+    max-height: 50vh;
+  }
+  .lb-prev {
+    left: 12px;
+    /* Кнопки ближе к краям — на мобильном меньше места */
+    font-size: 24px;
+  }
+  .lb-next {
+    right: 12px;
+    font-size: 24px;
+  }
+  .lb-close {
+    top: 16px;
+    right: 16px;
+  }
+
+  /* --- MISC --- */
+  .header-inner {
+    padding: 0 16px;
+    /* Меньше боковых отступов в шапке */
+  }
+  .container {
+    padding: 0 20px;
+    /* Меньше боковых отступов в контейнере */
+  }
+  .section-title {
+    font-size: clamp(22px, 5vw, 32px);
+    /* Заголовки секций меньше на мобильном */
+  }
+}
+
+/* ===================== RESPONSIVE: PHONE (<=480px) =====================
+   Обычные смартфоны
+*/
+@media (max-width: 480px) {
+  /* Портфолио на маленьком телефоне: 1 колонка */
+  .portfolio-grid {
+    grid-template-columns: 1fr;
+    gap: 12px;
+    padding: 0 16px 16px;
+  }
+  /* Горизонтальное соотношение для карточки портфолио — не вертикальное */
+  .portfolio-item {
+    aspect-ratio: 16/10;
+    /* 16:10 вместо 4:5 — карточки горизонтальные, больше изображения помещается */
+  }
+  .container {
+    padding: 0 16px;
+    /* Ещё меньше отступы */
+  }
+  /* Карточки команды: аватар над текстом (не рядом) */
+  .team-card {
+    flex-direction: column;
+    /* Вертикальное расположение вместо горизонтального */
+  }
+
+  /* Page inner */
+  .page-inner {
+    padding: 72px 0 24px;
+  }
+
+  /* About page */
+  .about-page-left {
+    height: 200px;
+    /* Ещё ниже фото */
+  }
+  .about-page-right {
+    padding: 24px 16px 32px;
+  }
+  /* Услуги: 1 колонка на маленьких телефонах */
+  .services-grid,
+  .services-grid.compact {
+    grid-template-columns: 1fr;
+  }
+  .about-stats {
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+  }
+  /* Числа статистики меньше */
+  .stat-num {
+    font-size: 30px;
+  }
+
+  /* Hero */
+  .hero-content {
+    padding: 0 16px;
+  }
+  .hero-sub {
+    font-size: 13px;
+    line-height: 1.7;
+  }
+  .btn-primary {
+    padding: 12px 24px;
+    /* Кнопки меньше */
+    font-size: 12px;
+  }
+
+  /* Order */
+  .order-inner {
+    padding: 40px 0 32px;
+    gap: 24px;
+  }
+  .order-img {
+    height: 160px;
+    /* Изображение в форме ниже */
+  }
+
+  /* Footer */
+  .footer {
+    padding: 32px 0 16px;
+    /* Больше отступов для "дыхания" */
+  }
+
+  /* Lightbox */
+  .lb-image {
+    width: 95vw;
+    /* Почти на весь экран */
+    max-height: 40vh;
+  }
+  .lb-title {
+    font-size: 16px;
+  }
+  .lb-thumbs {
+    gap: 4px;
+    /* Меньше зазор между миниатюрами */
+  }
+  .lb-thumb {
+    width: 36px;
+    height: 26px;
+    /* Миниатюры меньше */
+  }
+
+  /* Modal */
+  .modal-box {
+    padding: 36px 24px;
+    /* Меньше внутренних отступов */
+  }
+}
+
+/* ===================== RESPONSIVE: SMALL PHONE (<=360px) =====================
+   Очень маленькие экраны (устаревшие или компактные телефоны)
+*/
+@media (max-width: 360px) {
+  /* Шапка компактнее */
+  .header-inner {
+    height: 60px;
+    /* Уменьшаем высоту шапки с 72px до 60px */
+    padding: 0 12px;
+  }
+  /* Мобильное меню ниже по новой высоте шапки */
+  .nav {
+    top: 60px;
+    padding: 16px;
+    gap: 14px;
+  }
+  /* Логотип меньше */
+  .logo {
+    font-size: 18px;
+    letter-spacing: 2px;
+  }
+  /* Заголовок hero меньше */
+  .hero-title {
+    font-size: clamp(28px, 8vw, 40px);
+  }
+  /* Фото О студии ещё ниже */
+  .about-page-left {
+    height: 160px;
+  }
+  .about-page-right {
+    padding: 20px 12px 24px;
+  }
+  /* Заголовки секций меньше */
+  .section-title {
+    font-size: clamp(20px, 5vw, 28px);
+  }
+  /* Текст абзацев меньше */
+  .about-lead {
+    font-size: 13px;
+  }
+  /* Аватар команды меньше */
+  .team-avatar {
+    width: 36px;
+    height: 36px;
+    min-width: 36px;
+    font-size: 11px;
+  }
+}

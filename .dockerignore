@@ -1,0 +1,10 @@
+node_modules/
+playwright-report/
+.git/
+*.md
+tests.spec.js
+playwright.config.js
+package.json
+package-lock.json
+open_browser.py
+*.py
