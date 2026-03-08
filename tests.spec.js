@@ -203,7 +203,7 @@ test.describe('Lightbox', () => {
     await goToPage(page, 2);
 
     await page.click('.portfolio-item[data-index="1"]');
-    await expect(page.locator('#lbTitle')).toHaveText('Загородный дом');
+    await expect(page.locator('#lbTitle')).toHaveText('Lakehouse Retreat');
     await expect(page.locator('#lbCounter')).toHaveText('2 / 4');
   });
 
@@ -212,13 +212,13 @@ test.describe('Lightbox', () => {
     await goToPage(page, 2);
 
     await page.click('.portfolio-item[data-index="0"]');
-    await expect(page.locator('#lbTitle')).toHaveText('Квартира на Арбате');
+    await expect(page.locator('#lbTitle')).toHaveText('Downtown Vancouver Condo');
 
     await page.click('#lbNext');
-    await expect(page.locator('#lbTitle')).toHaveText('Загородный дом');
+    await expect(page.locator('#lbTitle')).toHaveText('Lakehouse Retreat');
 
     await page.click('#lbPrev');
-    await expect(page.locator('#lbTitle')).toHaveText('Квартира на Арбате');
+    await expect(page.locator('#lbTitle')).toHaveText('Downtown Vancouver Condo');
   });
 
   test('wraps around at boundaries', async ({ page }) => {
@@ -227,7 +227,7 @@ test.describe('Lightbox', () => {
 
     await page.click('.portfolio-item[data-index="0"]');
     await page.click('#lbPrev');
-    await expect(page.locator('#lbTitle')).toContainText('Бамбук');
+    await expect(page.locator('#lbTitle')).toContainText('Oak &amp; Pine');
     await expect(page.locator('#lbCounter')).toHaveText('4 / 4');
   });
 
@@ -267,10 +267,10 @@ test.describe('Lightbox', () => {
 
     await page.click('.portfolio-item[data-index="0"]');
     await page.keyboard.press('ArrowRight');
-    await expect(page.locator('#lbTitle')).toHaveText('Загородный дом');
+    await expect(page.locator('#lbTitle')).toHaveText('Lakehouse Retreat');
 
     await page.keyboard.press('ArrowLeft');
-    await expect(page.locator('#lbTitle')).toHaveText('Квартира на Арбате');
+    await expect(page.locator('#lbTitle')).toHaveText('Downtown Vancouver Condo');
   });
 
   test('thumbnail click changes image', async ({ page }) => {
@@ -279,7 +279,7 @@ test.describe('Lightbox', () => {
 
     await page.click('.portfolio-item[data-index="0"]');
     await page.click('.lb-thumb:nth-child(3)');
-    await expect(page.locator('#lbTitle')).toHaveText('Пентхаус Skyline');
+    await expect(page.locator('#lbTitle')).toHaveText('Skyline Penthouse');
   });
 });
 
@@ -314,9 +314,9 @@ test.describe('Order Form', () => {
     await openSite(page);
     await goToPage(page, 4);
 
-    await page.fill('#name', 'Иван Тестов');
-    await page.fill('#phone', '+7 (999) 123-45-67');
-    await page.fill('#email', 'test@mail.ru');
+    await page.fill('#name', 'John Tester');
+    await page.fill('#phone', '+1 (604) 123-4567');
+    await page.fill('#email', 'test@email.com');
     await page.click('button[type="submit"]');
 
     await expect(page.locator('#successModal')).not.toHaveClass(/hidden/);
@@ -326,9 +326,9 @@ test.describe('Order Form', () => {
     await openSite(page);
     await goToPage(page, 4);
 
-    await page.fill('#name', 'Тест');
-    await page.fill('#phone', '+7 999 1234567');
-    await page.fill('#email', 'a@b.ru');
+    await page.fill('#name', 'Test');
+    await page.fill('#phone', '+1 604 1234567');
+    await page.fill('#email', 'a@b.com');
     await page.click('button[type="submit"]');
 
     await page.click('#closeModalBtn');
@@ -339,9 +339,9 @@ test.describe('Order Form', () => {
     await openSite(page);
     await goToPage(page, 4);
 
-    await page.fill('#name', 'Тест');
-    await page.fill('#phone', '+7 999 1234567');
-    await page.fill('#email', 'a@b.ru');
+    await page.fill('#name', 'Test');
+    await page.fill('#phone', '+1 604 1234567');
+    await page.fill('#email', 'a@b.com');
     await page.click('button[type="submit"]');
 
     await page.keyboard.press('Escape');
@@ -352,9 +352,9 @@ test.describe('Order Form', () => {
     await openSite(page);
     await goToPage(page, 4);
 
-    await page.fill('#name', 'Тест');
-    await page.fill('#phone', '+7 999 1234567');
-    await page.fill('#email', 'a@b.ru');
+    await page.fill('#name', 'Test');
+    await page.fill('#phone', '+1 604 1234567');
+    await page.fill('#email', 'a@b.com');
     await page.click('button[type="submit"]');
 
     await page.locator('#successModal').click({ position: { x: 5, y: 5 } });
@@ -365,9 +365,9 @@ test.describe('Order Form', () => {
     await openSite(page);
     await goToPage(page, 4);
 
-    await page.fill('#name', 'Тест');
+    await page.fill('#name', 'Test');
     await page.fill('#phone', 'abc');
-    await page.fill('#email', 'a@b.ru');
+    await page.fill('#email', 'a@b.com');
     await page.click('button[type="submit"]');
 
     // Form should not submit — modal stays hidden
@@ -378,8 +378,8 @@ test.describe('Order Form', () => {
     await openSite(page);
     await goToPage(page, 4);
 
-    await page.fill('#name', 'Тест');
-    await page.fill('#phone', '+7 999 1234567');
+    await page.fill('#name', 'Test');
+    await page.fill('#phone', '+1 604 1234567');
     await page.fill('#email', 'not-an-email');
     await page.click('button[type="submit"]');
 
@@ -404,9 +404,9 @@ test.describe('Order Form', () => {
     await openSite(page);
     await goToPage(page, 4);
 
-    await page.fill('#name', 'Тест');
-    await page.fill('#phone', '+7 999 1234567');
-    await page.fill('#email', 'a@b.ru');
+    await page.fill('#name', 'Test');
+    await page.fill('#phone', '+1 604 1234567');
+    await page.fill('#email', 'a@b.com');
     await page.click('button[type="submit"]');
 
     // Close modal

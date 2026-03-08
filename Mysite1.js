@@ -200,28 +200,28 @@ document.addEventListener('click', (e) => {
 // ===================== ДАННЫЕ ПОРТФОЛИО =====================
 const portfolioData = [
   {
-    title: 'Квартира на Арбате',
-    desc:  'Москва · 120 м² · Современная классика',
+    title: 'Downtown Vancouver Condo',
+    desc:  'Vancouver, BC · 1,290 sq ft · Contemporary Classic',
     img:   'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=1200&q=80',
     thumb: 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=200&q=60',
   },
   {
-    title: 'Загородный дом',
-    desc:  'Подмосковье · 340 м² · Эко-стиль',
-    img:   'https://images.unsplash.com/photo-1567767292278-a4f21aa2d36e?auto=format&fit=crop&w=1200&q=80',
-    thumb: 'https://images.unsplash.com/photo-1567767292278-a4f21aa2d36e?auto=format&fit=crop&w=200&q=60',
+    title: 'Lakehouse Retreat',
+    desc:  'Muskoka, ON · 3,660 sq ft · Eco Style',
+    img:   'https://images.unsplash.com/photo-1512917774080-9991f1c4c750?auto=format&fit=crop&w=1200&q=80',
+    thumb: 'https://images.unsplash.com/photo-1512917774080-9991f1c4c750?auto=format&fit=crop&w=200&q=60',
   },
   {
-    title: 'Пентхаус Skyline',
-    desc:  'Москва · 200 м² · Минимализм',
-    img:   'https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?auto=format&fit=crop&w=1200&q=80',
-    thumb: 'https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?auto=format&fit=crop&w=200&q=60',
+    title: 'Skyline Penthouse',
+    desc:  'Toronto, ON · 2,150 sq ft · Minimalism',
+    img:   'https://images.unsplash.com/photo-1560448204-603b3fc33ddc?auto=format&fit=crop&w=1200&q=80',
+    thumb: 'https://images.unsplash.com/photo-1560448204-603b3fc33ddc?auto=format&fit=crop&w=200&q=60',
   },
   {
-    title: 'Ресторан «Бамбук»',
-    desc:  'Санкт-Петербург · 280 м² · Japandi',
-    img:   'https://images.unsplash.com/photo-1414235077428-338989a2e8c0?auto=format&fit=crop&w=1200&q=80',
-    thumb: 'https://images.unsplash.com/photo-1414235077428-338989a2e8c0?auto=format&fit=crop&w=200&q=60',
+    title: 'Oak & Pine Restaurant',
+    desc:  'Montreal, QC · 3,010 sq ft · Japandi',
+    img:   'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=1200&q=80',
+    thumb: 'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=200&q=60',
   },
 ];
 
