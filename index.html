@@ -1,0 +1,749 @@
+<!DOCTYPE html>
+<!-- Объявление типа документа — сообщает браузеру, что это HTML5. Без этого браузер может перейти в режим совместимости (quirks mode) -->
+<html lang="ru">
+<!-- lang="ru" — указывает язык страницы для поисковиков и программ чтения с экрана (screen readers), а также для проверки орфографии -->
+<head>
+  <!-- Секция head — мета-информация, не отображается на странице. Здесь подключаются стили, шрифты, задаётся кодировка -->
+
+  <meta charset="UTF-8">
+  <!-- charset="UTF-8" — кодировка символов. UTF-8 поддерживает кириллицу и все Unicode-символы. Без этого русский текст может отображаться как кракозябры -->
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <!-- viewport — ключевой мета-тег для адаптивной вёрстки.
+       width=device-width — ширина области просмотра = ширине экрана устройства (а не 980px по умолчанию на мобильных).
+       initial-scale=1.0 — начальный масштаб 1:1, без уменьшения. Без этого сайт на мобильном будет выглядеть как "уменьшенная версия" -->
+
+  <title>Серёга</title>
+  <!-- Заголовок вкладки браузера и страницы в результатах поиска -->
+
+  <link rel="stylesheet" href="Mysite1.css">
+  <!-- Подключение внешнего CSS-файла. rel="stylesheet" — тип связи. href — путь к файлу.
+       Ставится в head, чтобы браузер загрузил стили до начала рендеринга страницы и не было "вспышки неоформленного контента" (FOUC) -->
+</head>
+<body>
+<!-- body — всё видимое содержимое страницы -->
+
+  <!-- ============================================================
+       НАВИГАЦИЯ — фиксированная шапка сайта, всегда видна поверх всех страниц.
+       z-index: 1000 в CSS гарантирует, что header перекрывает все .page (z-index 10–50)
+  ============================================================ -->
+  <header class="header">
+    <!-- .header — фиксированный блок вверху. В CSS: position: fixed, top: 0, z-index: 1000.
+         Класс .light добавляется JS (updateUI) при переходе на страницы 1–4, меняя цвет шапки на светлый -->
+
+    <div class="header-inner">
+      <!-- .header-inner — внутренний контейнер с ограничением ширины (max-width: 1200px).
+           display: flex; justify-content: space-between — выравнивает логотип, навигацию и бургер по краям -->
+
+      <a href="#" class="logo" data-goto="0">Серёга</a>
+      <!-- Логотип — кликабельная ссылка.
+           href="#" — заглушка, реальный переход обрабатывает JS через data-goto.
+           data-goto="0" — атрибут для JS-навигации: при клике JS вызывает goToPage(0), возвращая на главную.
+           .logo в CSS: font-size: 22px, letter-spacing: 4px — разрядка букв для монограммного стиля -->
+
+      <nav class="nav" id="nav">
+        <!-- .nav — контейнер навигационных ссылок. id="nav" — нужен JS для управления мобильным меню.
+             На мобильных (<=768px) скрыт (display: none) и открывается по клику на бургер через .open -->
+
+        <a href="#" class="nav-link active" data-goto="0">Главная</a>
+        <!-- .nav-link — стиль навигационной ссылки. .active — выделяет текущую страницу (белый цвет, подчёркивание).
+             JS обновляет .active через updateUI() при каждом переходе.
+             data-goto="0" — номер страницы для goToPage() -->
+
+        <a href="#" class="nav-link" data-goto="1">О студии</a>
+        <!-- Ссылка на страницу "О студии" (data-page="1"). Изначально без .active -->
+
+        <a href="#" class="nav-link" data-goto="2">Портфолио</a>
+        <!-- Ссылка на страницу "Портфолио" (data-page="2") -->
+
+        <a href="#" class="nav-link" data-goto="3">Команда</a>
+        <!-- Ссылка на страницу "Команда" (data-page="3") -->
+
+        <a href="#" class="nav-btn" data-goto="4">Заказать проект</a>
+        <!-- .nav-btn — кнопка-призыв к действию (CTA) в навигации, визуально отличается от обычных ссылок:
+             желтоватый фон (--cta), заглавные буквы, рамка. Ведёт на страницу формы (data-page="4") -->
+      </nav>
+
+      <button class="burger" id="burger" aria-label="Открыть меню">&#9776;</button>
+      <!-- Кнопка-"бургер" для мобильной навигации (три горизонтальные линии &#9776; — символ ☰).
+           id="burger" — JS вешает на него обработчик клика.
+           aria-label="Открыть меню" — описание для программ чтения с экрана (доступность).
+           В CSS скрыт на десктопе (display: none) и показывается на <=768px -->
+    </div>
+  </header>
+
+  <!-- ============================================================
+       ИНДИКАТОР СТРАНИЦ — точки навигации справа по центру экрана.
+       Показывают текущую страницу и позволяют кликом перейти на любую.
+       z-index: 999 — ниже шапки (1000), но выше всех страниц (10–50)
+  ============================================================ -->
+  <div class="page-dots" id="pageDots">
+    <!-- .page-dots — фиксированный вертикальный список точек.
+         CSS: position: fixed; right: 28px; top: 50%; transform: translateY(-50%) — по центру правого края.
+         На мобильных (<=768px) скрыт (display: none) — нет места -->
+
+    <div class="dot active" data-goto="0" role="button" tabindex="0" aria-label="Страница 1: Главная"></div>
+    <!-- Первая точка — активна (.active) при загрузке, так как начинаем с страницы 0.
+         role="button" — говорит браузеру (и screen reader), что этот div работает как кнопка.
+         tabindex="0" — включает элемент в порядок клавиатурной навигации (Tab).
+         data-goto="0" — JS-навигация при клике. aria-label — описание для доступности -->
+
+    <div class="dot" data-goto="1" role="button" tabindex="0" aria-label="Страница 2: О студии"></div>
+    <!-- Точка страницы "О студии". JS добавляет/убирает .active через updateUI() -->
+
+    <div class="dot" data-goto="2" role="button" tabindex="0" aria-label="Страница 3: Портфолио"></div>
+    <!-- Точка страницы "Портфолио" -->
+
+    <div class="dot" data-goto="3" role="button" tabindex="0" aria-label="Страница 4: Команда"></div>
+    <!-- Точка страницы "Команда" -->
+
+    <div class="dot" data-goto="4" role="button" tabindex="0" aria-label="Страница 5: Заказать проект"></div>
+    <!-- Точка страницы формы заказа -->
+  </div>
+
+  <!-- ============================================================
+       СТРАНИЦА 0: ГЛАВНАЯ (HERO)
+       Первая страница — стартовый экран. data-page="0" — индекс для JS.
+       В CSS: z-index: 10 — самая нижняя в стеке, transform: translateY(0) — видима сразу.
+       Фон: тёмное изображение интерьера + затемняющий overlay (rgba 0.72)
+  ============================================================ -->
+  <div class="page" data-page="0">
+    <!-- .page — базовый класс каждой страницы. CSS делает её position: fixed, занимающей весь экран (top/left/right/bottom: 0).
+         Перемещение между страницами = анимация transform: translateY(0/100%) через CSS transition.
+         data-page="0" — индекс, используется CSS для z-index и JS для навигации -->
+
+    <div class="hero">
+      <!-- .hero — контейнер hero-секции. CSS: min-height: 100vh — на весь экран.
+           Фоновое изображение задано прямо в CSS (.hero), а не здесь — чтобы не загружать его через HTML-атрибут.
+           display: flex; align-items: center — вертикальное центрирование контента -->
+
+      <div class="hero-content">
+        <!-- .hero-content — внутренний блок с текстом. position: relative; z-index: 1 — поверх тёмного overlay.
+             max-width: 1200px; padding: 0 32px — ограничение ширины и отступы по бокам -->
+
+        <p class="hero-tag">Студия дизайна интерьера</p>
+        <!-- .hero-tag — маленький лейбл над заголовком. CSS: font-size: 11px, letter-spacing: 3px, text-transform: uppercase, color: --accent (золотистый).
+             Создаёт "этикетку категории" перед главным заголовком — стандартный приём для лендингов -->
+
+        <h1 class="hero-title">Создаём пространства,<br>в которых хочется жить</h1>
+        <!-- h1 — главный заголовок страницы, важен для SEO (поисковики ищут h1 как тему страницы).
+             <br> — ручной перенос строки для контроля вёрстки заголовка.
+             .hero-title в CSS: font-size: clamp(36px, 6vw, 78px) — адаптивный размер: от 36px до 78px в зависимости от ширины экрана -->
+
+        <p class="hero-sub">Разрабатываем концепции интерьеров для жилых и коммерческих объектов. От идеи — до финальной отделки.</p>
+        <!-- .hero-sub — подзаголовок/дескрипшн под главным заголовком. CSS: цвет rgba(255,255,255,0.6) — чуть прозрачный белый,
+             max-width: 480px — ограничивает ширину для читаемости длинного текста -->
+
+        <a href="#" class="btn-primary" data-goto="4">Обсудить проект</a>
+        <!-- Кнопка CTA (call-to-action) — главный призыв к действию на главной странице.
+             href="#" — заглушка, реальный переход через data-goto="4" обрабатывает JS.
+             .btn-primary — белая кнопка с тёмным текстом, при наведении становится золотистой (--accent) -->
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================================================
+       СТРАНИЦА 1: О СТУДИИ
+       data-page="1" — индекс в JS-стеке. z-index: 20 (выше страницы 0).
+       Начально скрыта: transform: translateY(100%) — "спрятана" вниз за экраном.
+       Фон: фотография интерьера + белый полупрозрачный overlay (rgba 0.82).
+       Двухколоночная сетка: фото слева, текст справа
+  ============================================================ -->
+  <div class="page" data-page="1">
+    <!-- При переходе JS меняет transform на translateY(0) — страница "выезжает" снизу -->
+
+    <div class="page-inner about-page">
+      <!-- .page-inner — базовый внутренний контейнер для всех страниц кроме 0: min-height: 100vh, padding: 100px 0 60px.
+           .about-page — переопределяет padding: 0, так как макет страницы О студии имеет собственные отступы
+           через двухколоночную сетку и padding в правой колонке -->
+
+      <div class="about-page-layout">
+        <!-- .about-page-layout — CSS Grid: grid-template-columns: 1fr 1fr — две равные колонки.
+             min-height: 100vh — растягивается на полный экран.
+             На мобильных (<=768px) переключается на одну колонку -->
+
+        <!-- ---- ЛЕВАЯ КОЛОНКА: фотография ---- -->
+        <div class="about-page-left">
+          <!-- .about-page-left — position: relative; overflow: hidden — обрезает фото по границам колонки.
+               Изображение внутри растягивается на всю высоту колонки через object-fit: cover -->
+
+          <div class="about-img-wrap">
+            <!-- Обёртка изображения: width: 100%; height: 100% — занимает всё пространство родителя -->
+
+            <img
+              src="https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=800&q=75"
+              alt="Интерьер студии Серёга"
+              class="about-img"
+              loading="lazy">
+            <!-- <img> — фотография для раздела О студии.
+                 src — URL картинки с Unsplash. auto=format — автовыбор формата (webp если поддерживается).
+                 fit=crop — кадрирование. w=800 — ширина 800px. q=75 — качество 75% (баланс качества и скорости).
+                 alt="Интерьер студии Серёга" — текст-альтернатива для SEO и screen readers.
+                 .about-img в CSS: width/height: 100%, object-fit: cover — заполняет блок без деформации.
+                 border: 4px solid rgba(200,169,110,0.75) — золотистая рамка (цвет --accent с прозрачностью).
+                 loading="lazy" — браузер загружает изображение только когда оно появляется в зоне видимости,
+                 экономя трафик при первой загрузке страницы -->
+          </div>
+        </div>
+
+        <!-- ---- ПРАВАЯ КОЛОНКА: текстовое содержимое ---- -->
+        <div class="about-page-right">
+          <!-- .about-page-right — padding: 100px 56px 40px (большой отступ сверху для шапки).
+               display: flex; flex-direction: column; justify-content: center — вертикальное центрирование содержимого -->
+
+          <div class="section-label">О студии</div>
+          <!-- .section-label — маленький лейбл-категория. CSS: font-size: 11px, letter-spacing: 3px,
+               text-transform: uppercase, color: --accent (золотистый). Повторяется на всех страницах для единого стиля -->
+
+          <h2 class="section-title">Мы превращаем квадратные метры<br>в индивидуальную историю</h2>
+          <!-- h2 — заголовок второго уровня (правильно для семантики, т.к. h1 уже на главной странице).
+               <br> — ручной перенос для красивого отображения.
+               .section-title: font-size: clamp(24px, 3vw, 40px) — адаптивный размер -->
+
+          <p class="about-lead">Серёга — студия дизайна интерьера с опытом работы более 8 лет. Мы работаем с частными квартирами, загородными домами, офисами, ресторанами и отелями.</p>
+          <!-- .about-lead — основной абзац текста. CSS: font-family: Arial (читабельнее для длинных текстов),
+               font-size: 14px, color: --mid (серый), line-height: 1.8 — увеличенный межстрочный интервал для читаемости -->
+
+          <p class="about-lead">Наш подход — глубокое погружение в задачу клиента. Мы не навязываем стили: слушаем, предлагаем и реализуем. Каждый проект проходит концептуальный этап, рабочую документацию и авторский надзор.</p>
+          <!-- Второй абзац описания студии. Тот же класс .about-lead -->
+
+          <!-- ---- СТАТИСТИКА ---- -->
+          <div class="about-stats">
+            <!-- .about-stats — CSS Grid: grid-template-columns: 1fr 1fr — два столбца, gap: 28px.
+                 Показывает 4 числовые метрики в сетке 2x2 -->
+
+            <div class="stat"><span class="stat-num">180+</span><span class="stat-label">реализованных проектов</span></div>
+            <!-- .stat — один блок статистики. border-top: 1px solid --border — разделительная линия сверху.
+                 .stat-num — крупное число: font-size: 40px, color: --accent (золотистый).
+                 .stat-label — подпись под числом: font-size: 13px, color: --mid -->
+
+            <div class="stat"><span class="stat-num">8</span><span class="stat-label">лет на рынке</span></div>
+            <div class="stat"><span class="stat-num">12</span><span class="stat-label">специалистов в команде</span></div>
+            <div class="stat"><span class="stat-num">96%</span><span class="stat-label">клиентов рекомендуют нас</span></div>
+          </div>
+
+          <!-- ---- УСЛУГИ ---- -->
+          <div class="section-label" style="margin-top:28px;">Что мы делаем</div>
+          <!-- Повторное использование .section-label. style="margin-top:28px" — инлайн-отступ,
+               потому что нужен отступ именно здесь, без создания отдельного класса -->
+
+          <div class="services-grid compact">
+            <!-- .services-grid — CSS Grid: grid-template-columns: repeat(4, 1fr) — 4 колонки.
+                 .compact — модификатор, уменьшает padding и font-size карточек для компактного вида
+                 (страница О студии, а не отдельный раздел услуг) -->
+
+            <div class="service-card">
+              <!-- .service-card — карточка услуги: белый фон, padding.
+                   При наведении фон становится тёмным (--dark), а текст белым — инверсия цвета для эффекта -->
+
+              <div class="service-icon">◈</div>
+              <!-- Unicode-символ в роли иконки. Использование символов вместо img/svg — простое решение без внешних зависимостей.
+                   .service-icon в CSS: font-size: 26px, color: --accent -->
+              <h3>Дизайн-проект</h3>
+              <!-- h3 — заголовок третьего уровня, логически вложен в h2 страницы -->
+              <p>Планировки, чертежи, 3D-визуализации, спецификации материалов.</p>
+            </div>
+
+            <div class="service-card">
+              <div class="service-icon">◉</div>
+              <!-- Другой Unicode-символ для второй услуги -->
+              <h3>Авторский надзор</h3>
+              <p>Контроль строительных и отделочных работ на всех этапах.</p>
+            </div>
+
+            <div class="service-card">
+              <div class="service-icon">◇</div>
+              <h3>Концептуальный дизайн</h3>
+              <p>Визуальный образ пространства без полного пакета документов.</p>
+            </div>
+
+            <div class="service-card">
+              <div class="service-icon">○</div>
+              <h3>Комплектация</h3>
+              <p>Подбор мебели, освещения, текстиля и декора под бюджет.</p>
+            </div>
+          </div>
+        </div>
+        <!-- конец .about-page-right -->
+
+      </div>
+      <!-- конец .about-page-layout -->
+    </div>
+    <!-- конец .page-inner.about-page -->
+  </div>
+  <!-- конец .page[data-page="1"] -->
+
+  <!-- ============================================================
+       СТРАНИЦА 2: ПОРТФОЛИО
+       data-page="2" — z-index: 30. Сетка из 4 карточек-проектов.
+       Фон: фотография интерьера + бежевый overlay (rgba(248,246,242,0.78))
+  ============================================================ -->
+  <div class="page" data-page="2">
+
+    <div class="page-inner portfolio-page">
+      <!-- .portfolio-page — переопределяет padding: 0, аналогично about-page.
+           Заголовок и сетка имеют собственные отступы -->
+
+      <div class="portfolio-header">
+        <!-- Шапка секции портфолио: лейбл + заголовок + подсказка.
+             padding: 88px 40px 28px — большой верхний отступ для шапки сайта -->
+
+        <div class="section-label">Наши работы</div>
+        <!-- Лейбл-категория (тот же стиль, что на всех страницах) -->
+
+        <h2 class="section-title">Портфолио</h2>
+
+        <p class="section-sub portfolio-hint">Нажмите на проект — откроется полный просмотр.</p>
+        <!-- .section-sub — серый подзаголовок. .portfolio-hint — модификатор:
+             font-size: 17px и color: --dark (тёмный, не серый) — важная подсказка, выделяется -->
+      </div>
+
+      <div class="portfolio-grid">
+        <!-- .portfolio-grid — CSS Grid: grid-template-columns: repeat(4, 1fr) — 4 колонки.
+             gap: 23px; padding: 0 25px 25px — отступы вокруг и между карточками -->
+
+        <div class="portfolio-item" data-index="0">
+          <!-- .portfolio-item — карточка проекта. data-index="0" — индекс для открытия лайтбокса (JS).
+               CSS: position: relative; overflow: hidden — для overlay и hover-эффекта.
+               aspect-ratio: 4/5 — вертикальное соотношение сторон карточки.
+               border: 4px solid rgba(200,169,110,0.75) — золотистая рамка.
+               При наведении: rамка становится ярче (--accent), тень усиливается -->
+
+          <div class="portfolio-placeholder p0"></div>
+          <!-- .portfolio-placeholder — блок с фоновым изображением вместо <img>.
+               Использование background-image (не <img>) упрощает масштабирование с object-fit: cover.
+               .p0 — уточняющий класс с конкретным background-image (первое фото проекта).
+               При hover на родителе: transform: scale(1.06) — лёгкое увеличение (zoom-эффект) -->
+
+          <div class="portfolio-overlay">
+            <!-- .portfolio-overlay — тёмный градиент снизу с названием проекта.
+                 CSS: position: absolute; bottom: 0; gradient от прозрачного к rgba(26,26,26,0.85).
+                 Изначально скрыт: transform: translateY(100%) — за нижним краем.
+                 При hover: translateY(0) — выезжает вверх.
+                 На тач-устройствах (hover: none) показан всегда — нет hover на мобильных -->
+
+            <span class="portfolio-title">Квартира на Арбате</span>
+            <!-- Название проекта поверх фото. CSS: color: #fff, font-size: 14px -->
+
+            <span class="portfolio-meta">Москва · 120 м²</span>
+            <!-- Мета-информация (город, площадь). CSS: font-size: 11px, полупрозрачный белый -->
+          </div>
+        </div>
+
+        <div class="portfolio-item" data-index="1">
+          <!-- Второй проект. data-index="1" — при клике откроется второй элемент в лайтбоксе -->
+          <div class="portfolio-placeholder p1"></div>
+          <!-- .p1 — фон: фото загородного дома -->
+          <div class="portfolio-overlay">
+            <span class="portfolio-title">Загородный дом</span>
+            <span class="portfolio-meta">Подмосковье · 340 м²</span>
+          </div>
+        </div>
+
+        <div class="portfolio-item" data-index="2">
+          <!-- Третий проект -->
+          <div class="portfolio-placeholder p2"></div>
+          <!-- .p2 — фон: фото пентхауса -->
+          <div class="portfolio-overlay">
+            <span class="portfolio-title">Пентхаус Skyline</span>
+            <span class="portfolio-meta">Москва · 200 м²</span>
+          </div>
+        </div>
+
+        <div class="portfolio-item" data-index="3">
+          <!-- Четвёртый проект -->
+          <div class="portfolio-placeholder p3"></div>
+          <!-- .p3 — фон: фото ресторана -->
+          <div class="portfolio-overlay">
+            <span class="portfolio-title">Ресторан «Бамбук»</span>
+            <span class="portfolio-meta">Санкт-Петербург · 280 м²</span>
+          </div>
+        </div>
+      </div>
+      <!-- конец .portfolio-grid -->
+
+    </div>
+    <!-- конец .page-inner.portfolio-page -->
+  </div>
+  <!-- конец .page[data-page="2"] -->
+
+  <!-- ============================================================
+       СТРАНИЦА 3: КОМАНДА
+       data-page="3" — z-index: 40. Сетка из 6 карточек сотрудников.
+       Фон: фотография + белый overlay 0.87 (почти непрозрачный — текст должен читаться)
+  ============================================================ -->
+  <div class="page" data-page="3">
+
+    <div class="page-inner team-page">
+      <!-- .team-page — дополнительный класс (в CSS отдельно задаётся padding-top: 80px для этой страницы) -->
+
+      <div class="container">
+        <!-- .container — общий контейнер ширины: max-width: 1200px; margin: 0 auto; padding: 0 32px.
+             Центрирует контент и ограничивает максимальную ширину -->
+
+        <div class="section-label">Люди</div>
+        <!-- Лейбл "Люди" — категория раздела -->
+
+        <h2 class="section-title">Наша команда</h2>
+
+        <p class="section-sub">Профессионалы с опытом в архитектуре, дизайне и управлении проектами</p>
+        <!-- .section-sub — серый подзаголовок. На странице команды: margin-bottom: 16px (меньше обычного 40px),
+             чтобы карточки умещались на экране -->
+
+        <div class="team-grid">
+          <!-- .team-grid — CSS Grid: grid-template-columns: repeat(3, 1fr) — три колонки, gap: 12px (компактно).
+               На планшете (<=1024px): 2 колонки. На мобильном (<=768px): 1 колонка -->
+
+          <!-- ---- Карточка 1: Анна Петрова ---- -->
+          <div class="team-card">
+            <!-- .team-card — карточка сотрудника: border, белый фон, display: flex (аватар + текст рядом).
+                 При наведении: box-shadow + transform: translateY(-3px) — лёгкое поднятие карточки -->
+
+            <div class="team-avatar">АП</div>
+            <!-- .team-avatar — квадратный блок 40x40px с инициалами.
+                 Тёмный фон (--dark) + золотистый текст (--accent). Используется вместо фотографий —
+                 минималистичное решение, не требует загрузки изображений для каждого сотрудника -->
+
+            <div class="team-info">
+              <!-- .team-info — flex: 1 — занимает оставшееся место рядом с аватаром -->
+
+              <h3 class="team-name">Анна Петрова</h3>
+              <!-- .team-name: font-size: 15px, font-weight: normal — имя без жирности (элегантный стиль) -->
+
+              <p class="team-role">Основатель и арт-директор</p>
+              <!-- .team-role — должность: font-size: 10px, text-transform: uppercase, color: --accent (золотистый).
+                   Маленький размер + разрядка создают стиль "лейбла" -->
+
+              <p class="team-bio">Окончила МАРХИ, 14 лет в профессии. Специализируется на жилых интерьерах в стиле современного минимализма и ар-деко. Руководит концептуальным направлением студии.</p>
+              <!-- .team-bio — биографический текст: font-size: 12px, color: --mid, line-height: 1.5.
+                   Небольшой размер, чтобы биография умещалась в компактную карточку -->
+
+              <div class="team-tags"><span>Минимализм</span><span>Ар-деко</span><span>Жилые интерьеры</span></div>
+              <!-- .team-tags — теги специализации. display: flex; flex-wrap: wrap; gap: 5px.
+                   Каждый <span>: border: 1px solid --border, padding: 3px 9px — стиль "pill" без border-radius -->
+            </div>
+          </div>
+
+          <!-- ---- Карточка 2: Михаил Соколов ---- -->
+          <div class="team-card">
+            <div class="team-avatar">МС</div>
+            <div class="team-info">
+              <h3 class="team-name">Михаил Соколов</h3>
+              <p class="team-role">Главный архитектор</p>
+              <p class="team-bio">Архитектор с опытом работы в бюро Zaha Hadid Architects. Отвечает за планировочные решения, технический надзор и взаимодействие с подрядчиками.</p>
+              <div class="team-tags"><span>Архитектура</span><span>Коммерческие объекты</span><span>BIM</span></div>
+            </div>
+          </div>
+
+          <!-- ---- Карточка 3: Елена Кузнецова ---- -->
+          <div class="team-card">
+            <div class="team-avatar">ЕК</div>
+            <div class="team-info">
+              <h3 class="team-name">Елена Кузнецова</h3>
+              <p class="team-role">Ведущий дизайнер интерьера</p>
+              <p class="team-bio">10 лет опыта в жилом и ресторанном дизайне. Эксперт в работе с цветом и текстурами. Ведёт блог об интерьерных трендах с аудиторией 80 000 подписчиков.</p>
+              <div class="team-tags"><span>Рестораны</span><span>Скандинавский стиль</span><span>Цвет и свет</span></div>
+            </div>
+          </div>
+
+          <!-- ---- Карточка 4: Дмитрий Волков ---- -->
+          <div class="team-card">
+            <div class="team-avatar">ДВ</div>
+            <div class="team-info">
+              <h3 class="team-name">Дмитрий Волков</h3>
+              <p class="team-role">3D-визуализатор и VR-специалист</p>
+              <p class="team-bio">Создаёт фотореалистичные визуализации и VR-туры до начала строительства. Работает в 3ds Max, Corona Renderer и Unreal Engine.</p>
+              <div class="team-tags"><span>3ds Max</span><span>Corona</span><span>VR-туры</span></div>
+            </div>
+          </div>
+
+          <!-- ---- Карточка 5: Ольга Морозова ---- -->
+          <div class="team-card">
+            <div class="team-avatar">ОМ</div>
+            <div class="team-info">
+              <h3 class="team-name">Ольга Морозова</h3>
+              <p class="team-role">Руководитель проектов</p>
+              <p class="team-bio">Координирует процессы от первого звонка до сдачи объекта. Следит за соблюдением сроков и бюджетов. Имеет сертификат PMP и опыт ведения 60+ проектов.</p>
+              <div class="team-tags"><span>Управление проектами</span><span>PMP</span><span>Бюджетирование</span></div>
+            </div>
+          </div>
+
+          <!-- ---- Карточка 6: Артём Лебедев ---- -->
+          <div class="team-card">
+            <div class="team-avatar">АЛ</div>
+            <div class="team-info">
+              <h3 class="team-name">Артём Лебедев</h3>
+              <p class="team-role">Дизайнер мебели и декора</p>
+              <p class="team-bio">Специализируется на подборе и кастомизации мебели, освещения и декора. Партнёрские договорённости с ведущими итальянскими и скандинавскими фабриками.</p>
+              <div class="team-tags"><span>Декорирование</span><span>Комплектация</span><span>Авторская мебель</span></div>
+            </div>
+          </div>
+
+        </div>
+        <!-- конец .team-grid -->
+      </div>
+      <!-- конец .container -->
+    </div>
+    <!-- конец .page-inner.team-page -->
+  </div>
+  <!-- конец .page[data-page="3"] -->
+
+  <!-- ============================================================
+       СТРАНИЦА 4: ФОРМА ЗАКАЗА + ФУТЕР
+       data-page="4" — z-index: 50 — самая верхняя страница в стеке.
+       Содержит форму обратной связи и подвал (footer).
+       Фон: фото интерьера + белый overlay 0.88
+  ============================================================ -->
+  <div class="page" data-page="4">
+
+    <div class="page-inner order-page">
+      <!-- .page-inner: padding-top: 80px (специфично для страниц 3 и 4 — меньше чем стандартные 100px).
+           padding-bottom: 16px — минимальный нижний отступ, так как есть footer -->
+
+      <div class="container">
+        <!-- Центрирующий контейнер ширины max-width: 1200px -->
+
+        <div class="order-inner">
+          <!-- .order-inner — CSS Grid: grid-template-columns: 1fr 1fr, gap: 72px — две равные колонки с большим промежутком.
+               На планшете (<=1024px): одна колонка. padding: 80px 0 60px — внутренние отступы -->
+
+          <!-- ---- ЛЕВАЯ КОЛОНКА: информация ---- -->
+          <div class="order-info">
+
+            <div class="section-label">Начнём работу</div>
+            <!-- Лейбл-категория золотистого цвета -->
+
+            <h2 class="section-title">Оставьте заявку — мы свяжемся<br>в течение одного дня</h2>
+            <!-- Заголовок с обещанием — ключевой триггер для конверсии формы.
+                 <br> — ручной перенос строки -->
+
+            <p>Расскажите нам о вашем объекте, и мы подготовим предварительную смету и план работ бесплатно.</p>
+            <!-- Подробное описание ценностного предложения. CSS (.order-info p): font-family: Arial, font-size: 15px, color: --mid -->
+
+            <ul class="order-benefits">
+              <!-- .order-benefits — список преимуществ. list-style: none — убраны стандартные маркеры списка.
+                   display: flex; flex-direction: column; gap: 10px — вертикальный список с отступами -->
+
+              <li>✦ Бесплатная консультация</li>
+              <!-- ✦ — декоративный символ-маркер вместо стандартной bullet-точки. Font-size: 14px, color: --dark -->
+              <li>✦ Предварительная смета без обязательств</li>
+              <li>✦ Фиксированная стоимость проекта в договоре</li>
+            </ul>
+
+            <div class="order-img-wrap">
+              <!-- .order-img-wrap — overflow: hidden — обрезает изображение по границам блока.
+                   margin-top: 28px — отступ от списка преимуществ -->
+
+              <img
+                src="https://images.unsplash.com/photo-1555041469-a586c61ea9bc?auto=format&fit=crop&w=700&q=75"
+                alt="Интерьер"
+                class="order-img"
+                loading="lazy">
+              <!-- Декоративное изображение интерьера. w=700 — меньше чем на странице О студии, хватает для узкого блока.
+                   .order-img: height: 220px; object-fit: cover — фиксированная высота, заполняет блок.
+                   filter: brightness(0.92) saturate(0.85) — слегка приглушает фото для элегантности.
+                   border: 4px solid rgba(200,169,110,0.75) — та же золотистая рамка, что и на других фото сайта.
+                   loading="lazy" — отложенная загрузка для производительности -->
+            </div>
+          </div>
+          <!-- конец .order-info -->
+
+          <!-- ---- ПРАВАЯ КОЛОНКА: форма ---- -->
+          <form class="order-form" id="orderForm">
+            <!-- <form> — HTML-форма. id="orderForm" — JS вешает на неё обработчик submit.
+                 .order-form — CSS Grid: grid-template-columns: 1fr 1fr — два столбца полей, gap: 18px.
+                 На мобильных: один столбец -->
+
+            <div class="form-group">
+              <!-- .form-group — обёртка поля: display: flex; flex-direction: column; gap: 5px.
+                   label сверху, input снизу — стандартный вертикальный макет формы -->
+
+              <label for="name">Ваше имя</label>
+              <!-- <label for="name"> — связывает метку с полем через атрибут id.
+                   Клик по label переводит фокус на input — улучшает UX.
+                   CSS: font-size: 11px, letter-spacing: 1px, text-transform: uppercase, color: --mid -->
+
+              <input type="text" id="name" name="name" placeholder="Иван Иванов" required>
+              <!-- type="text" — текстовое поле.
+                   id="name" — совпадает с for="name" в label.
+                   name="name" — ключ при отправке данных формы.
+                   placeholder — подсказка внутри поля до ввода текста.
+                   required — HTML5 валидация: поле обязательно к заполнению -->
+            </div>
+
+            <div class="form-group">
+              <label for="phone">Телефон</label>
+              <input type="tel" id="phone" name="phone" placeholder="+7 (___) ___-__-__" pattern="\+?[0-9\s\-\(\)]{7,20}" title="Введите корректный номер телефона" required>
+              <!-- type="tel" — тип телефона: на мобильных вызывает цифровую клавиатуру.
+                   pattern="\+?[0-9\s\-\(\)]{7,20}" — регулярное выражение для валидации:
+                     \+? — опциональный плюс в начале,
+                     [0-9\s\-\(\)] — цифры, пробелы, дефисы, скобки,
+                     {7,20} — от 7 до 20 символов.
+                   title — подсказка при неверном вводе (показывается браузером).
+                   required — обязательное поле -->
+            </div>
+
+            <div class="form-group">
+              <label for="email">Email</label>
+              <input type="email" id="email" name="email" placeholder="ivan@mail.ru" required>
+              <!-- type="email" — браузер автоматически проверяет формат email (наличие @, домена).
+                   На мобильных вызывает клавиатуру с @ и .com -->
+            </div>
+
+            <div class="form-group">
+              <label for="object">Тип объекта</label>
+              <select id="object" name="object" required>
+                <!-- <select> — выпадающий список. required — обязательно выбрать что-то кроме пустого варианта -->
+
+                <option value="">Выберите тип</option>
+                <!-- Пустая опция с пустым value — не проходит валидацию required, заставляет выбрать другой вариант -->
+
+                <option value="apartment">Квартира</option>
+                <option value="house">Загородный дом</option>
+                <option value="office">Офис</option>
+                <option value="restaurant">Ресторан / кафе</option>
+                <option value="other">Другое</option>
+                <!-- value — значение, которое будет отправлено. Текст внутри — то, что видит пользователь -->
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label for="area">Площадь (м²)</label>
+              <input type="number" id="area" name="area" placeholder="Например: 75" min="1">
+              <!-- type="number" — числовое поле: на мобильных цифровая клавиатура, стрелки вверх/вниз для изменения.
+                   min="1" — минимальное значение 1 (площадь не может быть 0 или отрицательной).
+                   Поле НЕ required — площадь опциональна -->
+            </div>
+
+            <div class="form-group full">
+              <!-- .form-group.full — растягивает поле на оба столбца: grid-column: 1 / -1 -->
+
+              <label for="message">Комментарий</label>
+              <textarea id="message" name="message" rows="3" placeholder="Расскажите о пожеланиях к проекту..."></textarea>
+              <!-- <textarea> — многострочное текстовое поле.
+                   rows="3" — начальная высота 3 строки.
+                   CSS: resize: none — запрещает пользователю изменять размер (чтобы не ломать макет).
+                   Поле НЕ required — комментарий опционален -->
+            </div>
+
+            <button type="submit" class="btn-primary full">Отправить заявку</button>
+            <!-- type="submit" — кнопка отправки формы. При клике срабатывает событие submit.
+                 .btn-primary.full — тёмный фон (--dark), белый текст, width: 100%, text-align: center.
+                 JS перехватывает submit через preventDefault(), показывая модальное окно вместо перезагрузки -->
+
+            <p class="form-note">Нажимая кнопку, вы соглашаетесь с <a href="#" class="privacy-link">политикой конфиденциальности</a></p>
+            <!-- .form-note — юридическая заметка. grid-column: 1 / -1 — на оба столбца. font-size: 11px, color: --light (светлый серый).
+                 .privacy-link — ссылка с подчёркиванием (text-decoration: underline) -->
+          </form>
+          <!-- конец .order-form -->
+
+        </div>
+        <!-- конец .order-inner -->
+      </div>
+      <!-- конец .container -->
+
+      <!-- ---- ФУТЕР ---- -->
+      <footer class="footer">
+        <!-- <footer> — семантический элемент подвала. Вынесен за .container, чтобы футер был на всю ширину.
+             CSS: padding: 16px 0; margin-top: auto — прижимает футер к низу через flex-column родителя;
+             text-align: center -->
+
+        <p class="footer-copy">&copy; 2026 Серёга. Все права защищены.</p>
+        <!-- &copy; — HTML-сущность знака копирайта ©.
+             .footer-copy: font-size: 11px, color: rgba(26,26,26,0.35) — едва заметный серый текст -->
+      </footer>
+
+    </div>
+    <!-- конец .page-inner.order-page -->
+  </div>
+  <!-- конец .page[data-page="4"] -->
+
+  <!-- ============================================================
+       ЛАЙТБОКС — полноэкранный просмотр фотографий портфолио.
+       Изначально скрыт (opacity: 0, pointer-events: none).
+       Открывается по клику на карточку портфолио через JS.
+       z-index: 5000 — поверх всего, включая шапку (1000)
+  ============================================================ -->
+  <div class="lightbox" id="lightbox">
+    <!-- #lightbox — идентификатор для JS. CSS: position: fixed; inset: 0 — на весь экран.
+         background: rgba(10,10,10,0.96) — почти непрозрачный тёмный фон.
+         Класс .open добавляется JS при открытии: opacity: 1; pointer-events: auto -->
+
+    <button class="lb-close" id="lbClose" aria-label="Закрыть просмотр">&#10005;</button>
+    <!-- Кнопка закрытия лайтбокса. &#10005; — символ ✕ (крестик).
+         position: absolute; top: 24px; right: 32px — в правом верхнем углу.
+         aria-label — доступность для screen readers -->
+
+    <button class="lb-prev" id="lbPrev" aria-label="Предыдущее фото">&#8592;</button>
+    <!-- Кнопка "назад". &#8592; — символ стрелки ← .
+         position: absolute; left: 32px; top: 50%; transform: translateY(-50%) — по вертикали по центру, у левого края -->
+
+    <button class="lb-next" id="lbNext" aria-label="Следующее фото">&#8594;</button>
+    <!-- Кнопка "вперёд". &#8594; — символ стрелки →.
+         position: absolute; right: 32px — у правого края -->
+
+    <div class="lb-content">
+      <!-- .lb-content — вертикальный flex-контейнер: изображение + мета-информация -->
+
+      <img class="lb-image" id="lbImage" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" alt="">
+      <!-- .lb-image — основное большое изображение проекта. width: 560px; max-width: 80vw; max-height: 55vh.
+           src инициализирован прозрачным 1x1px GIF в base64 — трюк для предотвращения ошибки "broken image"
+           при начальной загрузке (src не пуст, но показывает невидимый пиксель пока JS не назначит реальный src).
+           JS обновляет src через lbRender() при каждом переключении фото -->
+
+      <div class="lb-meta">
+        <!-- Блок метаданных под изображением: заголовок + описание. text-align: center -->
+
+        <p class="lb-title" id="lbTitle"></p>
+        <!-- Название проекта. Изначально пустое — JS заполняет через lbTitle.textContent -->
+
+        <p class="lb-desc" id="lbDesc"></p>
+        <!-- Описание проекта (город, площадь, стиль). JS заполняет через lbDesc.textContent -->
+      </div>
+    </div>
+
+    <div class="lb-counter" id="lbCounter"></div>
+    <!-- Счётчик текущего фото: "1 / 4". JS обновляет: `${lbCurrent + 1} / ${portfolioData.length}`.
+         CSS: font-size: 12px, color: rgba(255,255,255,0.35) — едва заметный -->
+
+    <div class="lb-thumbs" id="lbThumbs"></div>
+    <!-- Контейнер для миниатюр. JS динамически создаёт <img class="lb-thumb"> для каждого проекта.
+         display: flex; gap: 7px; flex-wrap: wrap; justify-content: center.
+         Активная миниатюра получает класс .active (золотистая рамка) -->
+  </div>
+
+  <!-- ============================================================
+       МОДАЛЬНОЕ ОКНО УСПЕХА — показывается после успешной отправки формы.
+       Изначально скрыто классом .hidden (display: none).
+       z-index: 6000 — выше лайтбокса (5000) — на случай если лайтбокс открыт
+  ============================================================ -->
+  <div id="successModal" class="modal hidden">
+    <!-- #successModal — id для JS. .modal — тёмный полупрозрачный overlay на весь экран.
+         .hidden — display: none при закрытии. JS убирает/добавляет .hidden при показе/скрытии -->
+
+    <div class="modal-box">
+      <!-- .modal-box — белый блок по центру экрана: max-width: 380px; padding: 52px 44px; text-align: center.
+           Позиционируется через flex родителя (align-items/justify-content: center) -->
+
+      <p class="modal-icon">✦</p>
+      <!-- Декоративный символ звезды. .modal-icon: font-size: 28px, color: --accent (золотистый) -->
+
+      <h3>Заявка отправлена!</h3>
+      <!-- Заголовок подтверждения. CSS: font-size: 22px, font-weight: normal -->
+
+      <p>Мы свяжемся с вами в течение одного рабочего дня.</p>
+      <!-- Информационный текст. CSS: font-family: Arial, font-size: 14px, color: --mid -->
+
+      <button id="closeModalBtn" class="btn-primary">Хорошо</button>
+      <!-- Кнопка закрытия модалки. id="closeModalBtn" — JS вешает на неё обработчик.
+           .btn-primary — стиль основной кнопки (тёмный фон, белый текст).
+           Также модалка закрывается по клику на overlay (#successModal) и по Escape (JS) -->
+    </div>
+  </div>
+
+  <script src="Mysite1.js"></script>
+  <!-- Подключение JS в конце body — не в <head>.
+       Это гарантирует, что весь HTML уже разобран браузером, когда JS начинает работать.
+       Если поставить в <head> без defer/async, JS выполнится до создания DOM и не найдёт элементы -->
+</body>
+</html>
