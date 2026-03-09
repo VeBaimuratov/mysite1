@@ -1,9 +1,5 @@
 # Dev Engineering Log
 
-> Tracks every significant engineering task. Newest entry first.
-> To add a new entry, use the template in [DEVLOG.template.md](DEVLOG.template.md).
-
----
 
 ### [ENTRY-001] — Project Bootstrap & CI/CD Setup
 
