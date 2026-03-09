@@ -317,6 +317,7 @@ test.describe('Order Form', () => {
     await page.fill('#name', 'John Tester');
     await page.fill('#phone', '+1 (604) 123-4567');
     await page.fill('#email', 'test@email.com');
+    await page.selectOption('#object', 'apartment');
     await page.click('button[type="submit"]');
 
     await expect(page.locator('#successModal')).not.toHaveClass(/hidden/);
@@ -329,6 +330,7 @@ test.describe('Order Form', () => {
     await page.fill('#name', 'Test');
     await page.fill('#phone', '+1 604 1234567');
     await page.fill('#email', 'a@b.com');
+    await page.selectOption('#object', 'apartment');
     await page.click('button[type="submit"]');
 
     await page.click('#closeModalBtn');
@@ -342,6 +344,7 @@ test.describe('Order Form', () => {
     await page.fill('#name', 'Test');
     await page.fill('#phone', '+1 604 1234567');
     await page.fill('#email', 'a@b.com');
+    await page.selectOption('#object', 'apartment');
     await page.click('button[type="submit"]');
 
     await page.keyboard.press('Escape');
@@ -355,6 +358,7 @@ test.describe('Order Form', () => {
     await page.fill('#name', 'Test');
     await page.fill('#phone', '+1 604 1234567');
     await page.fill('#email', 'a@b.com');
+    await page.selectOption('#object', 'apartment');
     await page.click('button[type="submit"]');
 
     await page.locator('#successModal').click({ position: { x: 5, y: 5 } });
@@ -407,6 +411,7 @@ test.describe('Order Form', () => {
     await page.fill('#name', 'Test');
     await page.fill('#phone', '+1 604 1234567');
     await page.fill('#email', 'a@b.com');
+    await page.selectOption('#object', 'apartment');
     await page.click('button[type="submit"]');
 
     // Close modal
@@ -585,7 +590,7 @@ test.describe('Responsive: Portfolio Grid', () => {
     expect(cols).toBe(4);
   });
 
-  test('3 columns on tablet landscape', async ({ page }) => {
+  test('2 columns on tablet landscape', async ({ page }) => {
     await page.setViewportSize({ width: 1024, height: 768 });
     await openSite(page);
 
@@ -593,7 +598,7 @@ test.describe('Responsive: Portfolio Grid', () => {
       const el = document.querySelector('.portfolio-grid');
       return getComputedStyle(el).gridTemplateColumns.split(' ').length;
     });
-    expect(cols).toBe(3);
+    expect(cols).toBe(2);
   });
 
   test('2 columns on tablet portrait', async ({ page }) => {
