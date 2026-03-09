@@ -24,6 +24,7 @@ A static website in pure HTML, CSS, and JavaScript — no frameworks, no build t
 - **HTML5, CSS3, Vanilla JS** — markup and logic
 - **Playwright** — automated testing
 - **Docker + nginx** — containerization
+- **GitHub Actions** — CI pipeline (auto-runs tests on every push)
 - **GitHub + Netlify** — code storage and deployment
 
 ---
@@ -42,6 +43,19 @@ npm install
 npx playwright install
 npm test
 ```
+
+---
+
+## CI/CD Pipeline
+
+Every `git push` to `main` automatically:
+1. Spins up a clean Ubuntu server on GitHub
+2. Installs Node.js and project dependencies
+3. Installs Playwright browsers (Chrome, Firefox, Safari)
+4. Runs all 576 tests
+5. Saves an HTML test report as an artifact (kept for 7 days)
+
+If tests fail — the commit is marked red. If tests pass — Netlify auto-deploys.
 
 ---
 
@@ -64,3 +78,4 @@ docker compose up -d --build
 - Docker: Dockerfile, nginx, docker-compose
 - Git and GitHub: commits, push, repository workflow
 - Deploying to Netlify
+- GitHub Actions: writing a CI pipeline from scratch

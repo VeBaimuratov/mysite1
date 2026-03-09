@@ -1,0 +1,55 @@
+# Название pipeline — отображается в GitHub во вкладке Actions
+name: CI
+
+# Когда запускать:
+# - push в ветку main (когда пушишь готовый код)
+# - pull_request в main (когда кто-то предлагает изменения)
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  # Название job — можно назвать как угодно
+  test:
+    # На каком сервере запускать. ubuntu-latest — бесплатный Linux от GitHub
+    runs-on: ubuntu-latest
+
+    steps:
+      # Шаг 1: Скачать код из репозитория на сервер GitHub
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      # Шаг 2: Установить Node.js версии 20
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          # cache: сохраняет node_modules между запусками → следующий запуск быстрее
+          cache: 'npm'
+
+      # Шаг 3: Установить зависимости (только то что в package.json)
+      # npm ci — строгая версия npm install, подходит для CI (не меняет lock-файл)
+      - name: Install dependencies
+        run: npm ci
+
+      # Шаг 4: Установить браузеры для Playwright
+      # --with-deps — также установит системные библиотеки (нужно на Linux)
+      - name: Install Playwright browsers
+        run: npx playwright install --with-deps
+
+      # Шаг 5: Запустить все 576 тестов
+      - name: Run tests
+        run: npm test
+
+      # Шаг 6: Сохранить HTML-отчёт если тесты упали
+      # always() — выполняется даже если предыдущий шаг завершился с ошибкой
+      - name: Upload test report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report
+          path: playwright-report/
+          # Хранить отчёт 7 дней, потом удалить автоматически
+          retention-days: 7
