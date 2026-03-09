@@ -1,42 +1,45 @@
 # PARD Studio — Interior Design Portfolio Website
 
-My first learning project — a portfolio website for a fictional interior design studio.
+A fully tested, containerized, and deployed portfolio website for an interior design studio.
 
-**Live site:** [view on Netlify](https://chic-valkyrie-e5fe5a.netlify.app/)
-
----
-
-## What Was Built
-
-A static website in pure HTML, CSS, and JavaScript — no frameworks, no build tools.
-
-5 pages with fullpage navigation:
-- Home (hero section)
-- About (two-column layout, stats, services)
-- Portfolio (project grid with lightbox)
-- Team (staff cards)
-- Request form
+**Live site:** [chic-valkyrie-e5fe5a.netlify.app](https://chic-valkyrie-e5fe5a.netlify.app/)
+**CI status:** ![CI](https://github.com/VeBaimuratov/mysite1/actions/workflows/ci.yml/badge.svg)
 
 ---
 
 ## Tech Stack
 
-- **HTML5, CSS3, Vanilla JS** — markup and logic
-- **Playwright** — automated testing
-- **Docker + nginx** — containerization
-- **GitHub Actions** — CI pipeline (auto-runs tests on every push)
-- **GitHub + Netlify** — code storage and deployment
+| Layer | Technology |
+|-------|-----------|
+| Frontend | HTML5, CSS3, Vanilla JS |
+| Testing | Playwright (576 tests, 8 browser configs) |
+| Containerization | Docker + nginx:alpine |
+| CI/CD | GitHub Actions → Netlify auto-deploy |
+
+---
+
+## Features
+
+- **Fullpage navigation** — CSS `transform: translateY()` for GPU-accelerated transitions
+- **Lightbox** — project viewer with keyboard navigation, swipe support, and focus trap
+- **Responsive** — 5 breakpoints from 360px to 1440px
+- **Accessible** — aria-labels, roles, tabindex, keyboard navigation throughout
+- **Contact form** — client-side validation (regex for phone/email), success modal
+- **Cross-browser** — Chrome, Firefox, Safari (including WebKit prefixes)
 
 ---
 
 ## Testing
 
-72 tests covering navigation, lightbox, form, mobile menu, and responsiveness.
-Tests run across 8 configurations: Chrome, Firefox, Safari, iPad, iPhone, and more.
+72 tests × 8 configurations = **576 total**
 
-```
-576 tests — all passing
-```
+| Configuration | Type |
+|--------------|------|
+| Chrome, Firefox, Safari | Desktop 1440px |
+| iPad portrait / landscape | Tablet |
+| Pixel 5, iPhone 13, iPhone SE | Mobile |
+
+Test coverage: DOM structure, navigation, lightbox, form validation, mobile menu, accessibility, responsive breakpoints, CSS correctness.
 
 ```bash
 npm install
@@ -48,34 +51,32 @@ npm test
 
 ## CI/CD Pipeline
 
-Every `git push` to `main` automatically:
-1. Spins up a clean Ubuntu server on GitHub
-2. Installs Node.js and project dependencies
-3. Installs Playwright browsers (Chrome, Firefox, Safari)
-4. Runs all 576 tests
-5. Saves an HTML test report as an artifact (kept for 7 days)
+Every `git push` to `main` triggers GitHub Actions:
 
-If tests fail — the commit is marked red. If tests pass — Netlify auto-deploys.
-
----
-
-## Run with Docker
-
-```bash
-docker compose up -d --build
-# Site: http://localhost:8080
+```
+push → Ubuntu server → install deps → install browsers → 576 tests
+                                                              ↓
+                                                    ✅ pass → Netlify deploys
+                                                    ❌ fail → commit marked red
 ```
 
 ---
 
-## What I Learned
+## Run Locally with Docker
 
-- Building a responsive website from scratch (5 breakpoints — 360px to 1440px)
-- CSS variables, grid, flexbox, transform, transition
-- Vanilla JavaScript — navigation, animations, event handling, touch support
-- Finding and fixing bugs (found and fixed 27 of them)
-- Writing automated tests with Playwright
-- Docker: Dockerfile, nginx, docker-compose
-- Git and GitHub: commits, push, repository workflow
-- Deploying to Netlify
-- GitHub Actions: writing a CI pipeline from scratch
+```bash
+docker compose up -d --build
+# → http://localhost:8080
+```
+
+nginx:alpine image (~25 MB), gzip enabled, static assets cached for 30 days.
+
+---
+
+## What Was Done
+
+- Built a fullpage SPA from scratch without frameworks
+- Conducted 2 manual code audits, found and fixed **27 bugs** (P1–P4)
+- Wrote 72 automated Playwright tests covering the full feature set
+- Containerized with Docker + nginx
+- Set up CI/CD: GitHub Actions → Netlify
