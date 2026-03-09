@@ -227,7 +227,7 @@ test.describe('Lightbox', () => {
 
     await page.click('.portfolio-item[data-index="0"]');
     await page.click('#lbPrev');
-    await expect(page.locator('#lbTitle')).toContainText('Oak &amp; Pine');
+    await expect(page.locator('#lbTitle')).toContainText('Oak & Pine');
     await expect(page.locator('#lbCounter')).toHaveText('4 / 4');
   });
 
