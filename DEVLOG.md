@@ -1,30 +1,7 @@
 # Dev Engineering Log
 
-> This file tracks every significant engineering task on the project.
-> Each entry is a structured report: problem → solution → metrics → business impact.
-> Format kept consistent so any future employer or team member can audit the work history.
-
----
-
-## How to fill a new entry
-
-When starting a task, run:
-
-```
-Fill DEVLOG.md for the current task as an engineering report:
-- problem
-- solution
-- commands used
-- technologies
-- metrics before
-- metrics after
-- result
-- business impact
-```
-
----
-
-## Entry Template
+> Tracks every significant engineering task. Newest entry first.
+> To add a new entry, use the template in [DEVLOG.template.md](DEVLOG.template.md).
 
 ---
 
