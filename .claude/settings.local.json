@@ -2,7 +2,11 @@
   "permissions": {
     "allow": [
       "Bash(mv:*)",
-      "Bash(npx playwright:*)"
+      "Bash(npx playwright:*)",
+      "WebFetch(domain:github.com)",
+      "Bash(npm test:*)",
+      "Bash(git:*)",
+      "Skill(claude-api)"
     ]
   }
 }
