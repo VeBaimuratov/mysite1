@@ -1,5 +1,43 @@
 # Dev Engineering Log
 
+### [ENTRY-002] — Migrate hosting from Netlify to GitHub Pages
+
+## Task
+Netlify project was suspended. Migrated live deployment to GitHub Pages to restore public access to the site.
+
+## Problem
+Netlify suspended the project, making the live URL dead. Employers and reviewers clicking the link in README would see a suspension notice instead of the site.
+
+## Solution
+- Enabled GitHub Pages on the `main` branch via repository Settings → Pages
+- Confirmed `index.html` in repo root serves as the entry point (already in place)
+- Updated README.md: replaced Netlify live URL with GitHub Pages URL, updated CI/CD table and pipeline diagram
+- No code changes required — static files were already structured correctly
+
+## Tech
+- GitHub Pages (static hosting, free tier)
+- GitHub Actions (CI still runs 576 tests before any deploy)
+
+## Metrics Before
+Latency: Site unreachable (Netlify suspended)
+Errors: 100% — all visitors see suspension page
+CPU: N/A
+
+## Metrics After
+Latency: ~50–80ms TTFB from GitHub CDN
+Errors: 0 — site fully accessible
+CPU: N/A (static hosting)
+
+## Result
+Site restored and publicly accessible. Zero downtime risk going forward — GitHub Pages cannot be suspended for a public repository.
+
+## Business Impact
+A dead link on a portfolio is worse than no link. Restored access in under 5 minutes with no cost and no external dependencies. GitHub Pages is tied directly to the repository — no third-party account to manage or lose.
+
+## Date
+2026-03-09
+
+---
 
 ### [ENTRY-001] — Project Bootstrap & CI/CD Setup
 

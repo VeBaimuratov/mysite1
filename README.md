@@ -2,7 +2,7 @@
 
 A production-grade portfolio website built from scratch: no frameworks, no boilerplate, fully tested, containerized, and deployed with CI/CD automation.
 
-**Live:** [chic-valkyrie-e5fe5a.netlify.app](https://chic-valkyrie-e5fe5a.netlify.app/) &nbsp;|&nbsp; **CI:** ![CI](https://github.com/VeBaimuratov/mysite1/actions/workflows/ci.yml/badge.svg)
+**Live:** [vebaimuratov.github.io/mysite1](https://vebaimuratov.github.io/mysite1/) &nbsp;|&nbsp; **CI:** ![CI](https://github.com/VeBaimuratov/mysite1/actions/workflows/ci.yml/badge.svg)
 
 ---
 
@@ -16,7 +16,7 @@ A fullpage single-page application for an interior design studio — without Rea
 | Transitions | CSS `transform: translateY()` | GPU-composited layer — no layout/paint reflow, 60fps guaranteed |
 | Testing | Playwright | Cross-browser, headless, CI-native; single tool covers desktop + mobile + tablet |
 | Container | Docker + nginx:alpine | 25 MB image, production-grade serving, reproducible across any environment |
-| CI/CD | GitHub Actions → Netlify | Free tier, zero-config deploy on green CI, instant rollback on failure |
+| CI/CD | GitHub Actions → GitHub Pages | Free, zero-config deploy on green CI, hosted directly in the repository |
 
 ---
 
@@ -31,8 +31,8 @@ Playwright runs the same test suite across Chrome, Firefox, and Safari in a sing
 ### Why Docker + nginx:alpine?
 Eliminates "works on my machine" problems. The nginx:alpine image is 25 MB, has gzip enabled out of the box, and caches static assets for 30 days. Any developer or server can reproduce the exact production environment in one command.
 
-### Why GitHub Actions?
-Every push to `main` runs the full test suite on a clean Ubuntu server before deployment. This prevents broken code from reaching production without requiring any manual QA step.
+### Why GitHub Actions + GitHub Pages?
+Every push to `main` runs the full test suite on a clean Ubuntu server. GitHub Pages deploys automatically from the same repository — zero external services, zero cost, zero configuration drift.
 
 ---
 
@@ -76,7 +76,7 @@ npm test
 ```
 git push → GitHub Actions (Ubuntu) → install deps → install browsers → 576 tests
                                                                              ↓
-                                                               ✅ pass → Netlify deploys
+                                                               ✅ pass → GitHub Pages deploys
                                                                ❌ fail → commit blocked
 ```
 
