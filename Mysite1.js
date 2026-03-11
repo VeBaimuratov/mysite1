@@ -334,8 +334,22 @@ const switchToLogin = document.getElementById('switchToLogin');
 
 let isLoginMode = false;
 
-document.getElementById('openRegBtn').addEventListener('click', (e) => {
+const openRegBtn = document.getElementById('openRegBtn');
+
+// Восстановить авторизацию после перезагрузки страницы
+const savedUser = localStorage.getItem('currentUser');
+if (savedUser) {
+  const user = JSON.parse(savedUser);
+  openRegBtn.textContent = user.name;
+  openRegBtn.href = '/profile.html';
+}
+
+openRegBtn.addEventListener('click', (e) => {
   e.preventDefault();
+  if (localStorage.getItem('currentUser')) {
+    window.location.href = '/profile.html';
+    return;
+  }
   isLoginMode = false;
   updateRegForm();
   regModal.classList.remove('hidden');
@@ -360,32 +374,53 @@ function updateRegForm() {
   if (isLoginMode) {
     regTitle.textContent = 'Welcome Back';
     regNameGroup.style.display = 'none';
+    regNameGroup.querySelector('input').removeAttribute('required');
     regSubmitBtn.textContent = 'Log In';
-    regSwitch.innerHTML = 'Don\'t have an account? <a id="switchToLogin">Sign up</a>';
+    regSwitch.firstChild.textContent = 'Don\'t have an account? ';
+    switchToLogin.textContent = 'Sign up';
   } else {
     regTitle.textContent = 'Create Account';
     regNameGroup.style.display = '';
+    regNameGroup.querySelector('input').setAttribute('required', '');
     regSubmitBtn.textContent = 'Sign Up';
-    regSwitch.innerHTML = 'Already have an account? <a id="switchToLogin">Log in</a>';
+    regSwitch.firstChild.textContent = 'Already have an account? ';
+    switchToLogin.textContent = 'Log in';
   }
-  document.getElementById('switchToLogin').addEventListener('click', (e) => {
-    e.preventDefault();
-    isLoginMode = !isLoginMode;
-    updateRegForm();
-  });
 }
 
-regForm.addEventListener('submit', (e) => {
+regForm.addEventListener('submit', async (e) => {
   e.preventDefault();
   const data = Object.fromEntries(new FormData(regForm));
-  console.log(isLoginMode ? 'Login:' : 'Register:', data);
-  regModal.classList.add('hidden');
-  regForm.reset();
-  successModal.classList.remove('hidden');
-  document.querySelector('.modal-box h3').textContent = isLoginMode ? 'Welcome Back!' : 'Account Created!';
-  document.querySelector('.modal-box p').textContent = isLoginMode
-    ? 'You are now logged in.'
-    : 'Your account has been created successfully.';
+  const endpoint = isLoginMode ? '/api/login' : '/api/register';
+
+  try {
+    const res = await fetch(endpoint, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data)
+    });
+    const json = await res.json();
+
+    if (!res.ok) {
+      alert(json.error || 'Something went wrong');
+      return;
+    }
+
+    const user = isLoginMode ? json.user : { name: data.name, email: data.email };
+    localStorage.setItem('currentUser', JSON.stringify(user));
+    openRegBtn.textContent = user.name;
+    openRegBtn.href = '/profile.html';
+
+    regModal.classList.add('hidden');
+    regForm.reset();
+    successModal.classList.remove('hidden');
+    document.querySelector('.modal-box h3').textContent = isLoginMode ? 'Welcome Back!' : 'Account Created!';
+    document.querySelector('.modal-box p').textContent = isLoginMode
+      ? `Welcome, ${json.user.name}!`
+      : 'Your account has been created successfully.';
+  } catch (err) {
+    alert('Cannot connect to server. Make sure server.js is running.');
+  }
 });
 
 // ESC to close registration modal

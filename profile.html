@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Profile — PARD Studio</title>
+  <link rel="stylesheet" href="Mysite1.css">
+  <style>
+    body {
+      background: #0a0a0a;
+      color: #fff;
+      font-family: 'Helvetica Neue', sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 0;
+    }
+    .profile-card {
+      background: #141414;
+      border: 1px solid #2a2a2a;
+      border-radius: 16px;
+      padding: 48px;
+      width: 100%;
+      max-width: 420px;
+      text-align: center;
+    }
+    .profile-avatar {
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #c9a84c, #f0d080);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 32px;
+      font-weight: 700;
+      color: #0a0a0a;
+      margin: 0 auto 24px;
+    }
+    .profile-name {
+      font-size: 24px;
+      font-weight: 600;
+      margin-bottom: 8px;
+    }
+    .profile-email {
+      color: #888;
+      font-size: 14px;
+      margin-bottom: 32px;
+    }
+    .profile-joined {
+      font-size: 13px;
+      color: #555;
+      margin-bottom: 32px;
+    }
+    .btn-logout {
+      background: transparent;
+      border: 1px solid #c9a84c;
+      color: #c9a84c;
+      padding: 12px 32px;
+      border-radius: 8px;
+      font-size: 14px;
+      cursor: pointer;
+      transition: background 0.2s, color 0.2s;
+      width: 100%;
+    }
+    .btn-logout:hover {
+      background: #c9a84c;
+      color: #0a0a0a;
+    }
+    .back-link {
+      margin-top: 24px;
+      color: #555;
+      font-size: 13px;
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+    .back-link:hover {
+      color: #c9a84c;
+    }
+  </style>
+</head>
+<body>
+  <div class="profile-card">
+    <div class="profile-avatar" id="avatar">?</div>
+    <div class="profile-name" id="profileName">—</div>
+    <div class="profile-email" id="profileEmail">—</div>
+    <div class="profile-joined" id="profileJoined"></div>
+    <button class="btn-logout" id="logoutBtn">Log Out</button>
+  </div>
+  <a href="/Mysite1.html" class="back-link">← Back to site</a>
+
+  <script>
+    const user = JSON.parse(localStorage.getItem('currentUser') || 'null');
+
+    if (!user) {
+      window.location.href = '/Mysite1.html';
+    } else {
+      document.getElementById('avatar').textContent = user.name.charAt(0).toUpperCase();
+      document.getElementById('profileName').textContent = user.name;
+      document.getElementById('profileEmail').textContent = user.email;
+      document.title = `${user.name} — PARD Studio`;
+    }
+
+    document.getElementById('logoutBtn').addEventListener('click', () => {
+      localStorage.removeItem('currentUser');
+      window.location.href = '/Mysite1.html';
+    });
+  </script>
+</body>
+</html>
