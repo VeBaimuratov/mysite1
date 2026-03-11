@@ -1,5 +1,92 @@
 # Dev Engineering Log
 
+### [ENTRY-005] — Node.js backend server, SQLite auth, user profile page
+
+## Task
+Built a real backend for user registration and login. Added a profile page and persistent auth state in the nav.
+
+## Problem
+The registration/login modal was frontend-only — form data logged to console and was discarded. No users were stored anywhere. Additionally, after login the nav still showed "Sign Up" instead of the user's name, and clicking it re-opened the registration modal. A bug in `updateRegForm()` caused `isLoginMode` to desync, making login fail intermittently.
+
+## Solution
+- Built `server.js` using Express + better-sqlite3 + bcryptjs + cors (109 lines)
+- `POST /api/register` — validates fields, hashes password (bcrypt, 10 rounds), inserts into SQLite, returns 409 on duplicate email
+- `POST /api/login` — queries by email, compares hash via `bcrypt.compareSync`, returns user object (no password field)
+- `GET /api/users` — dev-only endpoint, returns all users without passwords
+- SQLite `users` table: `id INTEGER PRIMARY KEY AUTOINCREMENT`, `name`, `email UNIQUE`, `password` (hashed), `created_at`
+- Created `profile.html` — shows avatar (first letter of name), full name, email, logout button; redirects to main if not logged in
+- After login/register: nav button text changes to user's name, href switches to `/profile.html`, state persisted in `localStorage`
+- Fixed login mode bug: `updateRegForm()` was replacing `regSwitch.innerHTML` on every call, destroying the DOM element that had the `addEventListener`. Fixed by updating `textContent` of the existing element in place. Also removed `required` attribute from name field in login mode.
+
+## Tech
+- Node.js + Express (HTTP server, static file serving)
+- better-sqlite3 (synchronous SQLite, no async complexity)
+- bcryptjs (password hashing, salt rounds: 10)
+- cors (cross-origin requests during local dev)
+- localStorage (client-side auth persistence)
+
+## Metrics Before
+Errors: form data discarded on submit, login mode broke after 1 toggle
+
+## Metrics After
+Errors: 0 — registration and login fully functional end-to-end
+
+## Result
+- Users are stored in `users.db` with hashed passwords
+- Login/register works correctly across page reloads
+- Profile page accessible at `/profile.html` after auth
+
+## Business Impact
+Moving from fake frontend auth to a real backend is the critical step toward a production-ready application. bcrypt with 10 rounds makes brute-force attacks ~100ms per attempt — industry standard for web auth. SQLite is appropriate for single-server deployments and can be swapped for PostgreSQL with minimal code change when scale demands it.
+
+## Date
+2026-03-11
+
+---
+
+### [ENTRY-004] — Add Playwright tests for new features + Lighthouse CI
+
+## Task
+Wrote 13 new Playwright tests for registration modal and visual enhancements. Added Lighthouse CI workflow for automated Performance/Accessibility/SEO auditing.
+
+## Problem
+New features (registration form, hero animation, scroll indicator, section dividers) had zero test coverage. No automated way to track Performance and Accessibility scores — regressions could ship undetected.
+
+## Solution
+- Wrote 10 tests for the registration modal: open/close (button, overlay, ESC), Sign Up ↔ Log In toggle, form fields, submission with success modal, password minlength validation
+- Wrote 3 tests for visual enhancements: scroll indicator presence, section title gold divider (`::after`), hero fadeInUp animation
+- Created `.github/workflows/lighthouse.yml` using `treosh/lighthouse-ci-action@v12`
+- Lighthouse thresholds: Performance ≥ 80% (warn), Accessibility ≥ 90% (error), Best Practices ≥ 80% (warn), SEO ≥ 80% (warn)
+- Total test count: 72 → 85 per config, 576 → 680 total across 8 browser configs
+
+## Tech
+- Playwright (test authoring)
+- GitHub Actions (Lighthouse CI workflow)
+- treosh/lighthouse-ci-action v12
+
+## Metrics Before
+Latency: N/A
+Errors: 0 test failures, 0 Lighthouse audits
+CPU: N/A
+
+## Metrics After
+Latency: N/A
+Errors: 0 test failures (85/85 on Chromium), Lighthouse audits running on every push
+CPU: N/A
+
+## Result
+- 100% of new features covered by automated tests
+- Lighthouse CI runs automatically — Performance, Accessibility, SEO scores visible in GitHub Actions
+- Accessibility enforced at 90% threshold — builds fail if score drops below
+
+## Business Impact
+Test coverage went from 72 to 85 cases (+18%). Lighthouse CI is a standard SRE practice — it catches performance regressions, accessibility violations, and SEO issues before they reach production. At scale, fixing a P1 accessibility bug post-release costs 5–10x more than catching it in CI.
+
+## Date
+2026-03-10
+
+---
+
 ### [ENTRY-003] — Registration form and visual improvements
 
 ## Task

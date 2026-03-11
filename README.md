@@ -2,7 +2,7 @@
 
 A production-grade portfolio website built from scratch: no frameworks, no boilerplate, fully tested, containerized, and deployed with CI/CD automation.
 
-**Live:** [vebaimuratov.github.io/mysite1](https://vebaimuratov.github.io/mysite1/) &nbsp;|&nbsp; **CI:** ![CI](https://github.com/VeBaimuratov/mysite1/actions/workflows/ci.yml/badge.svg)
+**Live:** [vebaimuratov.github.io/mysite1](https://vebaimuratov.github.io/mysite1/) &nbsp;|&nbsp; **CI:** ![CI](https://github.com/VeBaimuratov/mysite1/actions/workflows/ci.yml/badge.svg) &nbsp;|&nbsp; **Lighthouse:** ![Lighthouse](https://github.com/VeBaimuratov/mysite1/actions/workflows/lighthouse.yml/badge.svg)
 
 ---
 
@@ -13,6 +13,9 @@ A fullpage single-page application for an interior design studio — without Rea
 | Layer | Technology | Why This Choice |
 |-------|-----------|-----------------|
 | Frontend | HTML5 + CSS3 + Vanilla JS | Zero runtime overhead, full control over behavior, no dependency risk |
+| Backend | Node.js + Express | Same language as frontend, minimal boilerplate, ideal for REST APIs |
+| Database | SQLite (better-sqlite3) | Zero-config, single file, synchronous API — right-sized for this workload |
+| Auth | bcryptjs | Industry-standard password hashing, 10 salt rounds, brute-force resistant |
 | Transitions | CSS `transform: translateY()` | GPU-composited layer — no layout/paint reflow, 60fps guaranteed |
 | Testing | Playwright | Cross-browser, headless, CI-native; single tool covers desktop + mobile + tablet |
 | Container | Docker + nginx:alpine | 25 MB image, production-grade serving, reproducible across any environment |
@@ -41,7 +44,8 @@ Every push to `main` runs the full test suite on a clean Ubuntu server. GitHub P
 - **Fullpage navigation** — GPU-accelerated `translateY` transitions, no janky scroll
 - **Hero animations** — staggered fadeInUp entrance for title, subtitle, and CTA; scroll indicator with pulse animation
 - **Lightbox** — project viewer with keyboard navigation, swipe gestures, and focus trap for accessibility
-- **Registration / Login** — modal form with Sign Up ↔ Log In toggle, input validation, ESC/overlay close
+- **Registration / Login** — real backend auth: bcrypt-hashed passwords, SQLite storage, persistent session via localStorage
+- **User profile page** — avatar, name, email, logout; nav button switches from "Sign Up" to user's name after auth
 - **Responsive** — 5 breakpoints: 360px → 480px → 768px → 1024px → 1440px
 - **Accessible** — ARIA labels, roles, tabindex, full keyboard navigation
 - **Contact form** — client-side regex validation (phone + email), success modal with reset
@@ -49,10 +53,10 @@ Every push to `main` runs the full test suite on a clean Ubuntu server. GitHub P
 
 ---
 
-## Testing: 576 Tests, 8 Configurations
+## Testing: 680 Tests, 8 Configurations
 
 ```
-72 test cases × 8 browser configs = 576 total tests
+85 test cases × 8 browser configs = 680 total tests
 ```
 
 | Configuration | Viewport |
@@ -61,7 +65,7 @@ Every push to `main` runs the full test suite on a clean Ubuntu server. GitHub P
 | iPad portrait / landscape | Tablet 768–1024px |
 | Pixel 5, iPhone 13, iPhone SE | Mobile 360–390px |
 
-**Coverage:** DOM structure, fullpage navigation, lightbox behavior, form validation, mobile menu, ARIA accessibility, responsive breakpoints, CSS correctness.
+**Coverage:** DOM structure, fullpage navigation, lightbox behavior, form validation, registration/login modal, mobile menu, ARIA accessibility, responsive breakpoints, CSS correctness, visual enhancements.
 
 **2 manual code audits** were conducted before the automated suite was written. **27 bugs found and fixed** (classified P1–P4 by severity) before writing a single automated test.
 
@@ -76,7 +80,7 @@ npm test
 ## CI/CD Pipeline
 
 ```
-git push → GitHub Actions (Ubuntu) → install deps → install browsers → 576 tests
+git push → GitHub Actions (Ubuntu) → install deps → install browsers → 680 tests
                                                                              ↓
                                                                ✅ pass → GitHub Pages deploys
                                                                ❌ fail → commit blocked
@@ -84,10 +88,27 @@ git push → GitHub Actions (Ubuntu) → install deps → install browsers → 5
 
 No manual deployment steps. No broken code reaches production.
 
+**Lighthouse CI** runs on every push — automatically audits Performance, Accessibility, Best Practices, and SEO. Scores are enforced: Accessibility below 90% fails the build.
+
 ---
 
-## Run Locally with Docker
+## Run Locally
 
+### With backend server (full auth):
+```bash
+npm install
+node server.js
+# Open: http://localhost:3000/Mysite1.html
+```
+
+### API endpoints:
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| POST | `/api/register` | Register new user (name, email, password) |
+| POST | `/api/login` | Login (email, password) → returns user object |
+| GET | `/api/users` | List all users — dev only |
+
+### With Docker (static only):
 ```bash
 docker compose up -d --build
 # Open: http://localhost:8080
@@ -101,7 +122,8 @@ nginx:alpine (~25 MB), gzip enabled, static assets cached 30 days.
 
 | What | Impact |
 |------|--------|
-| 576 automated tests | Catches regressions in seconds, not hours of manual QA |
+| 680 automated tests | Catches regressions in seconds, not hours of manual QA |
+| Lighthouse CI | Performance, Accessibility, SEO audited automatically on every push |
 | CI/CD pipeline | Zero-touch deploys — no developer time spent on shipping |
 | Docker containerization | Any environment reproduces production exactly — no onboarding friction |
 | No framework dependencies | No version conflicts, no security patches, no upgrade treadmill |
