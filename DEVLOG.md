@@ -1,5 +1,53 @@
 # Dev Engineering Log
 
+### [ENTRY-003] — Registration form and visual improvements
+
+## Task
+Added user registration/login modal and improved visual polish across the site.
+
+## Problem
+The site had no user authentication flow — a critical feature for any production web application. The hero section loaded without animation, feeling static. Portfolio cards lacked visual feedback depth. Section titles had no visual separation from content.
+
+## Solution
+- Built a registration/login modal with form toggle (Sign Up ↔ Log In) in pure Vanilla JS
+- Added "Sign Up" link to the navigation header
+- Implemented staggered fadeInUp CSS animation on hero content (tag → title → subtitle → CTA, 0.2s intervals)
+- Added scroll indicator with pulse animation on the hero page
+- Added gold accent divider (`::after` pseudo-element) under all section titles
+- Added gold glow effect on portfolio card hover (`box-shadow` with rgba accent color)
+- Form data currently logs to console — server backend planned for next iteration
+- Ran full Playwright test suite: 72/72 passing on Chromium
+
+## Tech
+- CSS `@keyframes` animations (fadeInUp, scrollPulse)
+- CSS `::after` pseudo-elements for decorative dividers
+- Vanilla JS DOM manipulation for modal state management
+- FormData API for form data extraction
+
+## Metrics Before
+Latency: N/A (no new network requests)
+Errors: 0 (72/72 tests passing before changes)
+CPU: N/A
+
+## Metrics After
+Latency: N/A (all changes are client-side CSS/JS, zero network overhead)
+Errors: 0 (72/72 tests still passing after changes)
+CPU: Negligible — CSS animations use GPU compositing (`transform`, `opacity`)
+
+## Result
+- Site feels polished and alive on first load (hero animation draws the eye)
+- Registration flow ready for backend integration
+- Visual consistency improved: gold accents carry through titles, portfolio, and scroll indicator
+- Zero test regressions
+
+## Business Impact
+Registration form is the prerequisite for any user data collection, authentication, or personalized experience. Having it ready before the backend means the frontend is not a blocker when the server goes live. The visual improvements increase perceived quality — first impressions matter in portfolio sites and product demos alike.
+
+## Date
+2026-03-10
+
+---
+
 ### [ENTRY-002] — Migrate hosting from Netlify to GitHub Pages
 
 ## Task

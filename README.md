@@ -39,7 +39,9 @@ Every push to `main` runs the full test suite on a clean Ubuntu server. GitHub P
 ## Features
 
 - **Fullpage navigation** — GPU-accelerated `translateY` transitions, no janky scroll
+- **Hero animations** — staggered fadeInUp entrance for title, subtitle, and CTA; scroll indicator with pulse animation
 - **Lightbox** — project viewer with keyboard navigation, swipe gestures, and focus trap for accessibility
+- **Registration / Login** — modal form with Sign Up ↔ Log In toggle, input validation, ESC/overlay close
 - **Responsive** — 5 breakpoints: 360px → 480px → 768px → 1024px → 1440px
 - **Accessible** — ARIA labels, roles, tabindex, full keyboard navigation
 - **Contact form** — client-side regex validation (phone + email), success modal with reset
