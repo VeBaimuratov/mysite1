@@ -111,6 +111,12 @@ window.addEventListener('wheel', (e) => {
 
 // ===================== КЛАВИАТУРА (unified) =====================
 document.addEventListener('keydown', (e) => {
+  // Registration modal: ESC to close
+  if (!document.getElementById('regModal').classList.contains('hidden')) {
+    if (e.key === 'Escape') document.getElementById('regModal').classList.add('hidden');
+    return;
+  }
+
   // Success modal: ESC to close
   if (!successModal.classList.contains('hidden')) {
     if (e.key === 'Escape') closeModal();
@@ -316,3 +322,75 @@ lightbox.addEventListener('touchend', (e) => {
 
 // Init UI on page load (dots colour for page 0)
 updateUI();
+
+// ===================== REGISTRATION / LOGIN =====================
+const regModal = document.getElementById('regModal');
+const regForm = document.getElementById('regForm');
+const regTitle = document.getElementById('regTitle');
+const regNameGroup = document.getElementById('regNameGroup');
+const regSubmitBtn = document.getElementById('regSubmitBtn');
+const regSwitch = document.getElementById('regSwitch');
+const switchToLogin = document.getElementById('switchToLogin');
+
+let isLoginMode = false;
+
+document.getElementById('openRegBtn').addEventListener('click', (e) => {
+  e.preventDefault();
+  isLoginMode = false;
+  updateRegForm();
+  regModal.classList.remove('hidden');
+  nav.classList.remove('open');
+});
+
+document.getElementById('regCloseBtn').addEventListener('click', () => {
+  regModal.classList.add('hidden');
+});
+
+regModal.addEventListener('click', (e) => {
+  if (e.target === regModal) regModal.classList.add('hidden');
+});
+
+switchToLogin.addEventListener('click', (e) => {
+  e.preventDefault();
+  isLoginMode = !isLoginMode;
+  updateRegForm();
+});
+
+function updateRegForm() {
+  if (isLoginMode) {
+    regTitle.textContent = 'Welcome Back';
+    regNameGroup.style.display = 'none';
+    regSubmitBtn.textContent = 'Log In';
+    regSwitch.innerHTML = 'Don\'t have an account? <a id="switchToLogin">Sign up</a>';
+  } else {
+    regTitle.textContent = 'Create Account';
+    regNameGroup.style.display = '';
+    regSubmitBtn.textContent = 'Sign Up';
+    regSwitch.innerHTML = 'Already have an account? <a id="switchToLogin">Log in</a>';
+  }
+  document.getElementById('switchToLogin').addEventListener('click', (e) => {
+    e.preventDefault();
+    isLoginMode = !isLoginMode;
+    updateRegForm();
+  });
+}
+
+regForm.addEventListener('submit', (e) => {
+  e.preventDefault();
+  const data = Object.fromEntries(new FormData(regForm));
+  console.log(isLoginMode ? 'Login:' : 'Register:', data);
+  regModal.classList.add('hidden');
+  regForm.reset();
+  successModal.classList.remove('hidden');
+  document.querySelector('.modal-box h3').textContent = isLoginMode ? 'Welcome Back!' : 'Account Created!';
+  document.querySelector('.modal-box p').textContent = isLoginMode
+    ? 'You are now logged in.'
+    : 'Your account has been created successfully.';
+});
+
+// ESC to close registration modal
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape' && !regModal.classList.contains('hidden')) {
+    regModal.classList.add('hidden');
+  }
+});

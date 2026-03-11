@@ -62,6 +62,7 @@
         <a href="#" class="nav-btn" data-goto="4">Get a Quote</a>
         <!-- .nav-btn — кнопка-призыв к действию (CTA) в навигации, визуально отличается от обычных ссылок:
              желтоватый фон (--cta), заглавные буквы, рамка. Ведёт на страницу формы (data-page="4") -->
+        <a href="#" class="nav-link" id="openRegBtn">Sign Up</a>
       </nav>
 
       <button class="burger" id="burger" aria-label="Open menu">&#9776;</button>
@@ -138,6 +139,10 @@
         <!-- Кнопка CTA (call-to-action) — главный призыв к действию на главной странице.
              href="#" — заглушка, реальный переход через data-goto="4" обрабатывает JS.
              .btn-primary — белая кнопка с тёмным текстом, при наведении становится золотистой (--accent) -->
+      </div>
+      <div class="scroll-indicator">
+        <span>Scroll</span>
+        <div class="scroll-arrow"></div>
       </div>
     </div>
   </div>
@@ -738,6 +743,31 @@
       <!-- Кнопка закрытия модалки. id="closeModalBtn" — JS вешает на неё обработчик.
            .btn-primary — стиль основной кнопки (тёмный фон, белый текст).
            Также модалка закрывается по клику на overlay (#successModal) и по Escape (JS) -->
+    </div>
+  </div>
+
+  <!-- REGISTRATION MODAL -->
+  <div id="regModal" class="reg-overlay hidden">
+    <div class="reg-box">
+      <button class="reg-close" id="regCloseBtn" aria-label="Close">&#10005;</button>
+      <div class="section-label">Welcome</div>
+      <h3 class="section-title" id="regTitle">Create Account</h3>
+      <form class="reg-form" id="regForm">
+        <div class="form-group" id="regNameGroup">
+          <label for="regName">Full Name</label>
+          <input type="text" id="regName" name="name" placeholder="John Smith" required>
+        </div>
+        <div class="form-group">
+          <label for="regEmail">Email</label>
+          <input type="email" id="regEmail" name="email" placeholder="john@email.com" required>
+        </div>
+        <div class="form-group">
+          <label for="regPassword">Password</label>
+          <input type="password" id="regPassword" name="password" placeholder="Min 6 characters" minlength="6" required>
+        </div>
+        <button type="submit" class="btn-primary full" id="regSubmitBtn">Sign Up</button>
+      </form>
+      <p class="reg-switch" id="regSwitch">Already have an account? <a id="switchToLogin">Log in</a></p>
     </div>
   </div>
 
