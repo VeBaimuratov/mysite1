@@ -890,3 +890,117 @@ test.describe('Responsive: Small Phone (360px)', () => {
     await expect(page.locator('.about-lead').first()).toBeVisible();
   });
 });
+
+// ============================================================
+// REGISTRATION / LOGIN MODAL
+// ============================================================
+test.describe('Registration Modal', () => {
+  test('Sign Up button exists in navigation', async ({ page }) => {
+    await openSite(page);
+    await expect(page.locator('#openRegBtn')).toHaveText('Sign Up');
+  });
+
+  test('modal opens on Sign Up click', async ({ page }) => {
+    await openSite(page);
+    await page.click('#openRegBtn');
+    await expect(page.locator('#regModal')).toBeVisible();
+    await expect(page.locator('#regTitle')).toHaveText('Create Account');
+  });
+
+  test('modal has all registration fields', async ({ page }) => {
+    await openSite(page);
+    await page.click('#openRegBtn');
+    await expect(page.locator('#regName')).toBeVisible();
+    await expect(page.locator('#regEmail')).toBeVisible();
+    await expect(page.locator('#regPassword')).toBeVisible();
+    await expect(page.locator('#regSubmitBtn')).toHaveText('Sign Up');
+  });
+
+  test('switches to Login mode', async ({ page }) => {
+    await openSite(page);
+    await page.click('#openRegBtn');
+    await page.click('#switchToLogin');
+    await expect(page.locator('#regTitle')).toHaveText('Welcome Back');
+    await expect(page.locator('#regSubmitBtn')).toHaveText('Log In');
+    await expect(page.locator('#regNameGroup')).toBeHidden();
+  });
+
+  test('switches back to Sign Up mode', async ({ page }) => {
+    await openSite(page);
+    await page.click('#openRegBtn');
+    await page.click('#switchToLogin');
+    await page.click('#switchToLogin');
+    await expect(page.locator('#regTitle')).toHaveText('Create Account');
+    await expect(page.locator('#regNameGroup')).toBeVisible();
+  });
+
+  test('modal closes on close button', async ({ page }) => {
+    await openSite(page);
+    await page.click('#openRegBtn');
+    await page.click('#regCloseBtn');
+    await expect(page.locator('#regModal')).toBeHidden();
+  });
+
+  test('modal closes on overlay click', async ({ page }) => {
+    await openSite(page);
+    await page.click('#openRegBtn');
+    await page.locator('#regModal').click({ position: { x: 5, y: 5 } });
+    await expect(page.locator('#regModal')).toBeHidden();
+  });
+
+  test('modal closes on ESC', async ({ page }) => {
+    await openSite(page);
+    await page.click('#openRegBtn');
+    await page.keyboard.press('Escape');
+    await expect(page.locator('#regModal')).toBeHidden();
+  });
+
+  test('form submission shows success modal', async ({ page }) => {
+    await openSite(page);
+    await page.click('#openRegBtn');
+    await page.fill('#regName', 'Test User');
+    await page.fill('#regEmail', 'test@example.com');
+    await page.fill('#regPassword', 'password123');
+    await page.click('#regSubmitBtn');
+    await expect(page.locator('#regModal')).toBeHidden();
+    await expect(page.locator('#successModal')).toBeVisible();
+  });
+
+  test('password requires minimum 6 characters', async ({ page }) => {
+    await openSite(page);
+    await page.click('#openRegBtn');
+    const passwordInput = page.locator('#regPassword');
+    const minlength = await passwordInput.getAttribute('minlength');
+    expect(minlength).toBe('6');
+  });
+});
+
+// ============================================================
+// VISUAL ENHANCEMENTS
+// ============================================================
+test.describe('Visual Enhancements', () => {
+  test('hero has scroll indicator', async ({ page }) => {
+    await openSite(page);
+    await expect(page.locator('.scroll-indicator')).toBeAttached();
+    await expect(page.locator('.scroll-arrow')).toBeAttached();
+  });
+
+  test('section titles have gold divider', async ({ page }) => {
+    await openSite(page);
+    await goToPage(page, 1);
+    const hasAfter = await page.evaluate(() => {
+      const title = document.querySelector('.section-title');
+      const after = getComputedStyle(title, '::after');
+      return after.height !== '0px' && after.height !== 'auto';
+    });
+    expect(hasAfter).toBe(true);
+  });
+
+  test('hero content has fadeInUp animation', async ({ page }) => {
+    await openSite(page);
+    const animation = await page.evaluate(() => {
+      return getComputedStyle(document.querySelector('.hero-title')).animationName;
+    });
+    expect(animation).toBe('fadeInUp');
+  });
+});
